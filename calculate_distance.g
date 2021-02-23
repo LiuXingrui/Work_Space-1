@@ -19,9 +19,10 @@ h2xt:=1+x;
 
 
         
-
+#cyclic code check matrix from hx with x^n+1
+        
 cyclic_H:=function(hx,n)
-        local hx_vector_gf2, H, k,r,i1,i2,h;
+        local hx_vector_gf2, H, k,r,i1,i2,i3,h;
         
         H:=[];
 
@@ -33,20 +34,53 @@ cyclic_H:=function(hx,n)
         r:=n-k;
 
         for i1 in [1..r] do
+            H[i1]:=[];
+            if (n-k-i1)<>0 then
+                for i2 in [1..(n-k-i1)] do Add(H[i1], 0*Z(2)); od;
+            fi;
 
             h:=x^(i1-1)*hx;
-            H[i1]:=ShallowCopy(CoefficientsOfUnivariatePolynomial( h));
+            Append(H[i1],CoefficientsOfUnivariatePolynomial( h));
 
             #Print("for i1=",i1,"\n");
             #Print(G[i1],"\n");
+            if i1<>1 then
+                for i3 in [1..(i1-1)] do Add(H[i1], 0*Z(2)); od;
+            fi;
 
-            for i2 in [1..(n-i1)] do Add(H[i1], 0*Z(2)); od;
+           
                 
         od;
+        Print(DimensionsMat(H));
+    
+        #if n<>DimensionsMat(H)[2] then
+        #    Print("error: cyclic_H: \n  n=",n,"  column number=", DimensionsMat(H)[2], "\n");
+        #fi;
 
-     
         return H;
+
+#H looks like:
+        
+#   000...h_k...h_0
+#   .
+#   .
+#   .
+#   h_k...h_0...000
+
+#notice: CoefficientsOfUnivariatePolynomial:  1+2x+3x^3-> 3,0,2,1
+
+        
 end;
+
+#don't use this function now, because it will give the same form H as the last function, just replace hx by gx,
+#but we need 
+#   g_0...g_r000...
+#   0g_0...g_r00...
+#   .
+#   .
+#   000...g_0...g_r
+#02/23
+
 
 cyclic_G:=function(hx,n)
         local gx,fx,gx_vector_gf2, G,g, k,r,i1,i2;
@@ -80,13 +114,23 @@ cyclic_G:=function(hx,n)
         return G;
 end;
 
-HP_Hz:=function(h1x,h2xt,n1,n2)
-        local i,H1t,H2t,E1t,E2t,Hz_left,Hz_right;
+#get Hz from H1, H2^T and n1
+
+HP_Hz:=function(h1x,h2xt,n1)
+        local di,n2,i,H1,H1t,H2,H2t,E1t,E2t,Hz_left,Hz_right;
+
+#H1t: H1_Transposed, E1t: E1_tilt
+
+        H1:=cyclic_H(h1x,n1);
+        H2t:=cyclic_H(h2xt,n1);
+        H1t:=TransposedMat(H1);
+        H2:=TransposedMat(H2t);
+
+        di:=DimensionsMat( H2);
+        n2:=di[2];
         
-        H1t:=TransposedMat(cyclic_H(h1x,n1));
-        H2t:=cyclic_H(h2xt,n2);
-        E1t:=Identity(n1,Z(2));
-        E2t:=Identity(n2,Z(2));
+        E1t:=IdentityMat(n1,Z(2));
+        E2t:=IdentityMat(n2,Z(2));
         Hz_left:=KroneckerProduct(H2t,E1t);
         Hz_right:=KroneckerProduct(E2t,H1t);
         
@@ -97,17 +141,26 @@ HP_Hz:=function(h1x,h2xt,n1,n2)
             return Hz_left;
 
         else
-            Print("error :function HP_Hz");
+            Print("error :function HP_Hz \n");
+            return 0;
         fi;
 end;
 
-HP_Hx:=function(h1x,h2xt,n1,n2)
-        local i,k1,k2,r1,r2,H1,H2,E1,E2,Hx_left,Hx_right;
-      
+
+
+HP_Hx:=function(h1x,h2xt,n1)
+        local r1,r2,di,n2,i,H1,H1t,H2,H2t,E1,E2,Hx_left,Hx_right;
+
+
         H1:=cyclic_H(h1x,n1);
+        H2t:=cyclic_H(h2xt,n1);
+        H1t:=TransposedMat(H1);
+        H2:=TransposedMat(H2t);
+        di:=DimensionsMat( H2);
+        n2:=di[2];
         r1:=Length(H1);
-        H2:=TransposedMat( cyclic_H(h2xt,n2));
         r2:=Length(H2);
+        
         E1:=IdentityMat(r1,Z(2));
         E2:=IdentityMat(r2,Z(2));
         Hx_left:=KroneckerProduct(E2,H1);
@@ -120,7 +173,8 @@ HP_Hx:=function(h1x,h2xt,n1,n2)
             return Hx_left;
 
         else
-            Print("error :function HP_Hx");
+            Print("error :function HP_Hx \n");
+            return 0;
         fi;
 end;
 
@@ -212,18 +266,26 @@ end;
 #main function:
 
    
-for i in [1..10] do
+for i in [1..5] do
     n1:=i*n0;
-    n2:=n1;
+    n2t:=n1;
+#they are the row_numbers for H1, H2^T
 
 
+     H1:=cyclic_H(h1x,n1);
+     H2t:=cyclic_H(h2xt,n1);
+     H1t:=TransposedMat(H1);
+     H2:=TransposedMat(H2t);
+     di_1:=DimensionsMat( H1);
+     di_2:=DimensionsMat( H2);
+     n1:=di_1[2];
+     n2:=di_2[2];
+     r1:=di_1[1];
+     r2:=di_2[1];
 
-   
-    H1:=cyclic_H(h1x,n1);
-    H2:=TransposedMat(cyclic_H(h2xt,n2));
-    
-    r1:=Length(H1);
-    r2:=Length(H2);
+#notice: r1,r2 are not the ranks
+
+
     s1:=n1-r1;
     k1:=n1-RankMat(H1);
     s2:=n2-r2;
@@ -232,17 +294,16 @@ for i in [1..10] do
     n:=r2*n1+r1*n2;
     k:=2*k1*k2-k1*s2-k2*s1;
 
-    Hx:=HP_Hx(h1x,h2xt,n1,n2);
-    Hz:=HP_Hz(h1x,h2xt,n1,n2);
+    Hx:=HP_Hx(h1x,h2xt,n1);
+    Hz:=HP_Hz(h1x,h2xt,n1);
     d_upper_bound:=CSS_dist(Hx,Hz);;
   
-    Print("for H1 from h1x=",h1x, "and H2^T from h2xt=",h2xt, "  with x^(",n1,"*",i,")+1 we have:\n","n=",n,", k=",k," ,d<=",d_upper_bound," d=",d,"\n");
+    Print("for H1 from h1x=",h1x, "and H2^T from h2xt=",h2xt, "  with x^(",n1,"*",i,")+1 we have:\n","n=",n,", k=",k," ,d<=",d_upper_bound,"\n");
 
 
     #Print("for n1=",n1," G1=\n");
     #Display(G1);
-    Print("\n");
-
+  
 
 
 od;
