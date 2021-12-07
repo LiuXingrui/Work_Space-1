@@ -17,12 +17,18 @@ bmat bvec_to_bmatrix(const bvec &v,int r,int c)
 {
 
   //cout<<"vsize="<<v.size()<<endl;
+
+  if (v.size()>r*c){
+
+    cout<<"error in bvec_to_bmat: size of v is larger than r*c"<<endl;
+    return 0;
+  }
   bmat m(r,c);
   m.zeros();
   int index=0;
-  for (int i = 0; i <= r-1; ++i)
+  for (int i = 0; i <= r-1 && index<v.size(); ++i)
     {
-      for (int j=0;j<=c-1 &&((i+1)*r+j+1)<=v.size();++j)
+      for (int j=0;j<=c-1&& index<v.size() ;++j)
 	{
 	  m(i,j)=v[index];
 	  index++;
@@ -43,6 +49,10 @@ bvec bmat_to_bvector(const bmat &m,int s)
 
   int r=m.rows();
   int c=m.cols();
+  if (s>r*c) {
+    cout<<"error in bmat_to_bvec: s is larger than r*c"<<endl;
+    return 0;
+  }
   int k=0;
   int i,j;
   bvec v(s);
@@ -112,37 +122,64 @@ bmat burst_error_channel(const bmat &m,double initial_p)
 
 int main()
 {
-  int n,k,t,q,num_bits,num_lbits,num_pbits,L1,L2,i1,i2,i3;
+  int n,d,t,q,num_bits,num_lbits,num_pbits,L1,L2,i1,i2,i3;
   double n_cor_cws=0;
   double num_of_cws=0;
+  double p_i,p_f;
   bvec mas,cw, cor_cw1,cor_cw4,rec_cw,dec_m;
   bmat cor_cw2,cor_cw3;
 
  RNG_randomize();
 num_of_cws=10.0;
- for (int m=10;m<=13;m++){
+ for (int m=7;m<=10;m++){
+
+   //m at least be 7, or i3 will be zero and the prog will run forever
   n=pow(2,m)-1;
   q=n+1;
  
-   L1=m*(pow(2,ceil_i(m/2+log(m)/log(2))));
+   L1=m*(pow(2,ceil_i(m/2+log(m)/log(2))))+1;
    L2=pow(2,floor_i(m/2+log(m)/log(2)));
    
 
-  i1=n/15;
-  i2=n/10;
+  i1=n*14/15;
+  i2=n*9/10;
   i3=n/90;
   
-   for (int d=i1;d<=i2;d=i3+d){
+   for (int k=i2;k<=i1;k=i3+k){
      // for (int d=1;d<=2;d++){
-  
+     
+    if (k%2==0){
+      k=k+1;
+
+  }
+          // there is a" bug",  when decoding [n=2^m-1,k] code,  if k is even, then the length of the decoded massage is mk+m (it should be mk), I guess the reason is for k and k+1,  t=(d-1)/2 may be the same, and the prog choose the k+1 case.
+    //so we choose k always be odd
+
+ 
+  d=n-k+1;
   t=(d-1)/2;
-  k=n-d+1;
+
+
+  
   num_lbits=m*k;
   num_pbits=m*n;
   Reed_Solomon RS(m,t);
+  cout<<"\n"<<endl;
 
-  cout<<"d="<<d<<endl;
-  for (double p=0.001;p<=0.001;p=p+0.001){
+  // cout<<"d="<<d<<endl;
+  p_i=0.000;
+  p_f=0.05;
+    cout<<"for n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon code"<<endl;
+     cout<<"{ raw bit error rate, bit error rate after decoding}=";
+    
+    // cout<<"raw bit error rate=";
+    //  for (double p=p_i;p<=p_f; p=p+0.001){
+    //  cout<<p<<",";
+       
+    //}
+    
+    
+  for (double p=p_i;p<=p_f; p=p+0.001){
   
 
   BSC bsc(p);
@@ -160,23 +197,41 @@ num_of_cws=10.0;
     rec_cw.clear();
     dec_m.clear();
     mas=randb(num_lbits);
-    cw=RS.encode(mas);
+    
 
     
-   cor_cw1=bsc(cw);
+    //    cout<<"massize:  "<<mas.size()<<endl;
+    cw=RS.encode(mas);
+    //  cout<<n*m<<"  l of cw:  "<<cw.size()<<endl;
+  
+     cor_cw1=bsc(cw);
+
+    
     cor_cw2=bvec_to_bmatrix(cor_cw1,L1,L2);
     
-    cor_cw3=burst_error_channel(cor_cw2,p);
+     cor_cw3=burst_error_channel(cor_cw2,p);
     rec_cw=bmat_to_bvector(cor_cw3,num_pbits);
+    
+    //  if(cw!=rec_cw){
+    //    cout<<"error";
+    //    }
+    
     dec_m=RS.decode(rec_cw);
-  if (dec_m!=mas)
+
+    //  if (dec_m.size()>mas.size()){
+
+    // cout<<"size different"<<endl;
+    // }
+    
+      if (dec_m!=mas)
     {
     n_cor_cws++;
+    
   }
     
   }
-
-  cout<<"for n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon code, raw bit error rate p="<<p<<", (b+1)*(b+1) burst error rate=(0.1)^b*p, max_b=4, the error rate is "<<n_cor_cws/num_of_cws<<"\n"<<endl;
+  
+   cout<<"{"<<p<<","<<n_cor_cws/num_of_cws<<"},";
 
 
 
