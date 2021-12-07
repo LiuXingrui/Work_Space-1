@@ -74,24 +74,29 @@ bvec bmat_to_bvector(const bmat &m,int s)
 }
 
 
-bmat burst_error_channel(const bmat &m,double initial_p)
+bmat burst_error_channel(const bmat &m,double p2,double p3,double p4)
 {
   int r=m.rows();
   int c=m.cols();
   int my_random_number;
   bmat m1=m;
   bin ONE=1;
-  double p=initial_p;
+  vec p(5);
+
+  p.zeros();
+  p[2]=p2;
+  p[3]=p3;
+  p[4]=p4;
 
 
   
   int max_sidelength=4;
   for (int b = 2; b <= max_sidelength; ++b){
-    p=p*0.1;
+    
     for (int r1=0;r1<=r-1-b;++r1){
       for (int c1=0;c1<=c-1-b;++c1){
 	my_random_number=randi(1,1000);
-	if(my_random_number<=1000*p)
+	if(my_random_number<=1000*p[b])
 	  {
 	     for (int r2=0;r2<=b-1;++r2)
 	       {
@@ -130,8 +135,8 @@ int main()
   bmat cor_cw2,cor_cw3;
 
  RNG_randomize();
-num_of_cws=10.0;
- for (int m=7;m<=10;m++){
+num_of_cws=200.0;
+ for (int m=10;m<=14;m++){
 
    //m at least be 7, or i3 will be zero and the prog will run forever
   n=pow(2,m)-1;
@@ -168,9 +173,9 @@ num_of_cws=10.0;
 
   // cout<<"d="<<d<<endl;
   p_i=0.000;
-  p_f=0.05;
+  p_f=0.015;
     cout<<"for n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon code"<<endl;
-     cout<<"{ raw bit error rate, bit error rate after decoding}=";
+     cout<<"{ p1, p2,p3,p4, error rare after decoding}=";
     
     // cout<<"raw bit error rate=";
     //  for (double p=p_i;p<=p_f; p=p+0.001){
@@ -180,7 +185,10 @@ num_of_cws=10.0;
     
     
   for (double p=p_i;p<=p_f; p=p+0.001){
-  
+    for (double p2=p_i;p2<=0.5*p_f;p2=p2+0.001){
+      for (double p3=p_i;p3<=0.3*p_f;p3=p3+0.001){
+	for (double p4=p_i;p4<=0.2*p_f;p4=p4+0.001){
+	
 
   BSC bsc(p);
   
@@ -209,7 +217,7 @@ num_of_cws=10.0;
     
     cor_cw2=bvec_to_bmatrix(cor_cw1,L1,L2);
     
-     cor_cw3=burst_error_channel(cor_cw2,p);
+    cor_cw3=burst_error_channel(cor_cw2,p2,p3,p4);
     rec_cw=bmat_to_bvector(cor_cw3,num_pbits);
     
     //  if(cw!=rec_cw){
@@ -231,12 +239,14 @@ num_of_cws=10.0;
     
   }
   
-   cout<<"{"<<p<<","<<n_cor_cws/num_of_cws<<"},";
+  cout<<"{"<<p<<", "<<p2<<", "<<p3<<", "<<p4<<", "<<n_cor_cws/num_of_cws<<"},";
 
 
 
  }
-
+		       }
+	    }
+		 }
   
 
  }
