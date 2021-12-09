@@ -136,14 +136,16 @@ int main()
 
  RNG_randomize();
 num_of_cws=200.0;
- for (int m=10;m<=14;m++){
-
+// for (int m=10;m<=13;m++){
+ for (int m=7;m<=7;m++){
+ 
+ 
    //m at least be 7, or i3 will be zero and the prog will run forever
   n=pow(2,m)-1;
   q=n+1;
  
-   L1=m*(pow(2,ceil_i(m/2+log(m)/log(2))))+1;
-   L2=pow(2,floor_i(m/2+log(m)/log(2)));
+   L1=m*(pow(2,ceil_i(m/2+log(m)/log(2))));
+   L2=pow(2,m-ceil_i(m/2+log(m)/log(2)));
    
 
   i1=n*14/15;
@@ -173,7 +175,8 @@ num_of_cws=200.0;
 
   // cout<<"d="<<d<<endl;
   p_i=0.000;
-  p_f=0.015;
+  p_f=0.003;
+  // p_f=0.0015;
     cout<<"for n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon code"<<endl;
      cout<<"{ p1, p2,p3,p4, error rare after decoding}=";
     
