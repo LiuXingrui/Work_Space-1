@@ -135,7 +135,8 @@ int main()
   bmat cor_cw2,cor_cw3;
 
  RNG_randomize();
-num_of_cws=200.0;
+ //num_of_cws=200.0;
+ num_of_cws=1;
 // for (int m=10;m<=13;m++){
  for (int m=7;m<=7;m++){
  
@@ -144,8 +145,8 @@ num_of_cws=200.0;
   n=pow(2,m)-1;
   q=n+1;
  
-   L1=m*(pow(2,ceil_i(m/2+log(m)/log(2))));
-   L2=pow(2,m-ceil_i(m/2+log(m)/log(2)));
+   L1=m*(pow(2,ceil_i(m/2-log(m)/log(2))));
+   L2=pow(2,m-ceil_i(m/2-log(m)/log(2)));
    
 
   i1=n*14/15;
