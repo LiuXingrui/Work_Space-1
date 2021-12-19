@@ -75,6 +75,7 @@ bvec bmat_to_bvector(const bmat &m,int s)
 
 
 bmat burst_error_channel(const bmat &m,double p2,double p3,double p4)
+//bmat burst_error_channel  (const bmat &m,double p2)
 {
   int r=m.rows();
   int c=m.cols();
@@ -137,8 +138,8 @@ int main()
  RNG_randomize();
  //num_of_cws=200.0;
  num_of_cws=1;
-// for (int m=10;m<=13;m++){
- for (int m=7;m<=7;m++){
+ for (int m=10;m<=13;m++){
+// for (int m=7;m<=7;m++){
  
  
    //m at least be 7, or i3 will be zero and the prog will run forever
@@ -175,8 +176,8 @@ int main()
   cout<<"\n"<<endl;
 
   // cout<<"d="<<d<<endl;
-  p_i=0.000;
-  p_f=0.003;
+  p_i=0.001;
+  p_f=0.01;
   // p_f=0.0015;
     cout<<"for n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon code"<<endl;
      cout<<"{ p1, p2,p3,p4, error rare after decoding}=";
@@ -187,8 +188,9 @@ int main()
        
     //}
     
-    
-  for (double p=p_i;p<=p_f; p=p+0.001){
+       #pragma omp parallel for
+       for (int i=1;i<=10; i++){
+	 double p=0.001*i;
     for (double p2=p_i;p2<=0.5*p_f;p2=p2+0.001){
       for (double p3=p_i;p3<=0.3*p_f;p3=p3+0.001){
 	for (double p4=p_i;p4<=0.2*p_f;p4=p4+0.001){
