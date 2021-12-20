@@ -203,7 +203,7 @@ int main()
   for (int i=0;i<num_of_cws;i++)
   {
 
-     mas.clear();
+    /*   mas.clear();
     cw.clear();
     cor_cw1.clear();
     cor_cw2.clear();
@@ -212,7 +212,9 @@ int main()
     dec_m.clear();
     mas=randb(num_lbits);
     
+    */
 
+    //no need to clear those pointers, if keep those sentences, when run in parallel, there will be "double free or correuption ", but if only run in a single core, such errors won't happen, don't know why.
     
     //    cout<<"massize:  "<<mas.size()<<endl;
     cw=RS.encode(mas);
