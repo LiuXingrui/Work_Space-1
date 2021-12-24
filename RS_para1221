@@ -82,7 +82,7 @@ bvec bmat_to_bvector(const bmat &m,int s)
 
 
 //bmat burst_error_channel(const bmat &m,double p2,double p3,double p4)
-bmat burst_error_channel  (const bmat &m,double p1)
+/*bmat burst_error_channel  (const bmat &m,double p1)
 {
   int r=m.rows();
   int c=m.cols();
@@ -133,12 +133,53 @@ bmat burst_error_channel  (const bmat &m,double p1)
 
 }
 
+*/
+void burst_error_channel  ( bvec &m,double p1,int L1,int L2)
+{
+  int s=m.size();
+  int my_random_number;
+  bin ONE=1;
+  vec p(5);
+
+  p.zeros();
+  p[2]=p1*0.5;
+  p[3]=p1*0.5*0.5;
+  p[4]=p1*0.5*0.5*0.5;
+
+
+  
+  int max_sidelength=4;
+  for (int b = 2; b <= max_sidelength; ++b){
+    
+    for (int i=0;i<L1-b;++i){
+      for (int j=0;j<L2-b;++j){
+      
+	my_random_number=randi(1,1000);
+	if(my_random_number<=1000*p[b])
+	  {
+	    for (int i1=i;i1<i+b;++i1){
+	      for (int j1=j;j1<j+b;++j1){
+		m[i1*L1+j1]=m[i1*L1+j1]+randb();
+
+	      }
+	    }
+
+	      }
+
+
+	    }
+
+
+	  }
+ }
+
+}
 
 double RS_simulation (int m,int k,double p,double num_of_cws){
 
   int n,d,t,L1,L2, num_lbits, num_pbits;
   double n_cor_cws=0;
-  bvec mas,cw, cor_cw1,cor_cw4,rec_cw,dec_m;
+  bvec mas,cw, cor_cw,dec_m;
   bmat cor_cw2,cor_cw3;
 
   n=pow(2,m)-1;
@@ -160,13 +201,11 @@ double RS_simulation (int m,int k,double p,double num_of_cws){
 
     cw=RS.encode(mas);
   
-     cor_cw1=bsc(cw);
-    cor_cw2=bvec_to_bmatrix(cor_cw1,L1,L2);
+     cor_cw=bsc(cw);
     
-    cor_cw3=burst_error_channel(cor_cw2,p);
-    rec_cw=bmat_to_bvector(cor_cw3,num_pbits);
+     burst_error_channel(cor_cw,p,L1,L2);
    
-    dec_m=RS.decode(rec_cw);
+    dec_m=RS.decode(cor_cw);
 
  
     
@@ -180,10 +219,7 @@ double RS_simulation (int m,int k,double p,double num_of_cws){
 
   return n_cor_cws/num_of_cws;
 
-   
-   
-
-
+  
 
 }
 
@@ -203,7 +239,7 @@ int main()
 
  RNG_randomize();
  num_of_cws=1;
- for (int m=7;m<=7;m++){
+ for (int m=10;m<=13;m++){
 
     n=pow(2,m)-1;
 
