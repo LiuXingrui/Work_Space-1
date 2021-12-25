@@ -269,7 +269,7 @@ int main()
     p=i*0.001;
     cout<<endl;
 
-    //if do not add this flash line, there will be segmentation fault(core dumped) error, donot know why
+    //if do not add this flash line, there will be segmentation fault(core dumped) error, donot know why. if use flush instead of endl, it will also be errors.?
 	p2=RS_simulation (m,k,p,num_of_cws);
      
 	cout<<endl;
