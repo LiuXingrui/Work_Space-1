@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include<cstring>
 #include<string>
@@ -174,7 +175,7 @@ void burst_error_channel  ( bvec &m,double p1,int L1,int L2)
 double RS_simulation (int m,int k,double p,double num_of_cws){
 
   int n,d,t,L1,L2, num_lbits, num_pbits;
-  double n_cor_cws=0;
+  double n_cor_cws=0.0;
   bvec mas,cw, cor_cw,dec_m;
   bmat cor_cw2,cor_cw3;
 
@@ -189,7 +190,7 @@ double RS_simulation (int m,int k,double p,double num_of_cws){
    L1=m*(pow(2,ceil_i(m/2-log(m)/log(2))));
    L2=pow(2,m-ceil_i(m/2-log(m)/log(2)));
    BSC bsc(p);
-  
+   //  cout<<"3"<<endl;
   for (int i=0;i<num_of_cws;i++)
   {
 
@@ -203,16 +204,16 @@ double RS_simulation (int m,int k,double p,double num_of_cws){
    
     dec_m=RS.decode(cor_cw);
 
- 
+    //   cout<<"4"<<endl;
     
       if (dec_m!=mas)
     {
-    n_cor_cws++;
+    n_cor_cws=n_cor_cws+1.0;
     
   }
     
   }
-
+  
   return n_cor_cws/num_of_cws;
 
   
@@ -224,17 +225,17 @@ int main()
   int n,t,k,L1,L2,i1,i2,i3,d, num_lbits, num_pbits;
   double n_cor_cws=0;
   double num_of_cws=0;
-  double p,p2;
+  double p2;
   bvec mas,cw, cor_cw1,cor_cw4,rec_cw,dec_m;
   bmat cor_cw2,cor_cw3;
-
+  vector <double> p(10);
   omp_lock_t writelock;
      
   omp_init_lock(&writelock);
 
 
  RNG_randomize();
- num_of_cws=1;
+ num_of_cws=100.0;
  for (int m=10;m<=13;m++){
 
     n=pow(2,m)-1;
@@ -265,17 +266,17 @@ int main()
 
       #pragma omp parallel for 
     for (int i=1;i<=10;i++){ 
+      p[i-1]=i*0.001;
+      //if use    p=i*0.001, there will be errors,since p is a global variable,
+      cout<<endl;
 
-    p=i*0.001;
-    cout<<endl;
-
-    //if do not add this flash line, there will be segmentation fault(core dumped) error, donot know why. if use flush instead of endl, it will also be errors.?
-	p2=RS_simulation (m,k,p,num_of_cws);
+    //if do not add this endl line, there will be segmentation fault(core dumped) error, donot know why. if use flush instead of endl, it will also be errors.??
+	p[i-1]=RS_simulation (m,k,p[i-1],num_of_cws);
      
 	cout<<endl;
 	//same reason
 		 omp_set_lock(&writelock);
-	cout<<"{"<<i*0.001<<", "<<p2<<"},";
+	cout<<"{"<<i*0.001<<", "<<p[i-1]<<"},";
 	 omp_unset_lock(&writelock);
   
 
