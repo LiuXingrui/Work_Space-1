@@ -223,7 +223,7 @@ int main()
   double num_of_cws=100.0;
   int num_of_p=20;
 
-  for (int m=10;m<=13;++m){
+  for (int m=10;m<=14;m=m+2){
      product_simulation (m,pmin,pmax,num_of_p,num_of_cws);
     //  cout<<1<<endl;
   }
