@@ -113,9 +113,9 @@ void random_channel ( bmat &cw,bmat &cor_cw1,const int L1,BSC &bsc){
   
 
 
-void product_simulation (const int m,const double pmin,const double pmax,int num_of_p,const double num_of_cws){
+void product_simulation (const int n1,const int n2,const int k1,const int k2,const int a,const int m1,const double pmin,const double pmax,int num_of_p,const double num_of_cws){
 
-  int n,k,d,t,q,num_lbits_RS,L1,L2,i1,i2,i3,n1,n2,k1,d1,d2,a,m1;
+  int n,k,d,t,q,num_lbits_RS,L1,L2,i1,i2,i3,d1,d2;
   double num_of_cor_cws=0;
   int temp=num_of_cws;
   vec   counter(num_of_cws);
@@ -124,18 +124,9 @@ void product_simulation (const int m,const double pmin,const double pmax,int num
   // cout<<pintv<<endl;
   RNG_randomize();
 
-   m1=ceil_i(m/2+log(sqrt(m))/log(2));
-   n1=pow(2,m1)-1;
-   k1=pow(2,m1)-1-m1;
-   d1=3;
-	  
-   x=pow(2,m/2)*sqrt(m)*log(2);
-   a=floor((log(x)-log(log(x))+0.3)/log(2));
-   n2=pow(2,a)-1;
    n=n1*n2*a;
    //   cout<<floor(n*9/10)<<"\n"<<floor(14/15*n)<<endl;
 
-   for(int k2=n2-2;k2>=n2-8;k2=k2-2){
 
    // cout<<k<<endl;
    // cout<<"n1="<<n1<<"  n2="<<n2<<endl;
@@ -154,7 +145,7 @@ void product_simulation (const int m,const double pmin,const double pmax,int num
   L2=a*n2;
   n=L1*L2;
 
-  Array<bmat> cw(num_of_cws),cor_cw(num_of_cws),mas(num_of_cws),rec_mas(num_of_cws);
+ Array<bmat> cw(num_of_cws),cor_cw(num_of_cws),mas(num_of_cws),rec_mas(num_of_cws);
   bmat tempmat1(L1,L2),tempmat2(k1,a*k2);
   tempmat1.zeros();
   tempmat2.zeros();
@@ -166,13 +157,13 @@ void product_simulation (const int m,const double pmin,const double pmax,int num
 
 
   //cout<<"k1="<<k1<<"  k2="<<k2<<"  a="<<a<<endl;
-  cout<<"m="<<m<<"  n_1="<<n1<<", k_1="<<k1<<", d_1= "<<d1<<", n_2="<<n2<<", k_2="<<k2<<", d_2= "<<d2<<", n="<<n<<", k="<<k<<" Product code:ListPlot[{"<<endl;
+  cout<<"  n_1="<<n1<<", k_1="<<k1<<", d_1= "<<d1<<", n_2="<<n2<<", k_2="<<k2<<", d_2= "<<d2<<", n="<<n<<", k="<<k<<" Product code:ListPlot[{"<<endl;
 
  for (double p=pmin;p<=pmax+0.000000001;p=p+pintv){
      BSC bsc(p);
      num_of_cor_cws=0;
      counter.zeros();
-         #pragma omp parallel for
+            #pragma omp parallel for
   for (int i=0;i<temp;++i){
     mas(i)=randb(k1,a*k2);
     cw(i)=tempmat1;
@@ -210,7 +201,7 @@ void product_simulation (const int m,const double pmin,const double pmax,int num
  double rate=kdou/ndou;
  cout<<"},Joined->True,AxesLabel->{RBER,UBER},PlotLabel->\"["<<n<<", "<<k<<", Rate="<<rate<<"] Product code\"]\n"<<endl;
   
-}
+
 }
 
 int main()
@@ -220,12 +211,15 @@ int main()
   
   double pmax=5*pow(10,-3);
   // cout<<pmax<<endl;
-  double num_of_cws=100.0;
+  double num_of_cws=300.0;
   int num_of_p=20;
 
-  for (int m=10;m<=14;m=m+2){
-     product_simulation (m,pmin,pmax,num_of_p,num_of_cws);
+  
+  product_simulation (127,15,120,13,4,7,pmin,pmax,num_of_p,num_of_cws);
+    product_simulation (63,15,57,13,4,6,pmin,pmax,num_of_p,num_of_cws);
+      product_simulation (127,31,120,29,5,7,pmin,pmax,num_of_p,num_of_cws);
+        product_simulation (31,15,26,13,4,5,pmin,pmax,num_of_p,num_of_cws);
     //  cout<<1<<endl;
-  }
+  
   return 0;
 }
