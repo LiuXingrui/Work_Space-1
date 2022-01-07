@@ -139,6 +139,7 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
 	  
 	  
   d2=n2-k2+1;
+  d1=3;
   t=(d2-1)/2;
 
    L1=n1;
@@ -211,7 +212,7 @@ int main()
   
   double pmax=5*pow(10,-3);
   // cout<<pmax<<endl;
-  double num_of_cws=300.0;
+  double num_of_cws=100.0;
   int num_of_p=20;
 
   
