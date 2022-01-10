@@ -64,9 +64,10 @@ void RS_simulation (const int m,const int k,const double pmin,const double pmax,
   int n,d,t,L1,L2, num_lbits, num_pbits;
   double n_cor_cws=0.0;
   double pintv=(pmax-pmin)/(num_of_p-1);
+  double p;
   int temp=num_of_cws;
-   vec   counter(temp);
-
+  mat   counter(num_of_p,temp);
+   //   double p=pmin;
   n=pow(2,m)-1;
 
   
@@ -85,12 +86,13 @@ void RS_simulation (const int m,const int k,const double pmin,const double pmax,
   bvec tempvec1(num_pbits),tempvec2(num_lbits);
   tempvec1.zeros();
   tempvec2.zeros();
-
+  counter.zeros();
   cout<<"  n="<<n<<", k="<<k<<", d= "<<d<<" Reed-Solomon:ListPlot[{"<<endl;
-   for (double p=pmin;p<=pmax+0.000000001;p=p+pintv){
+  for (int pi=0;pi<num_of_p;++pi){
+       p=pmin+pi*pintv;
      BSC bsc(p);
      n_cor_cws=0;
-     counter.zeros();
+     
  
   
     #pragma omp parallel for
@@ -114,21 +116,28 @@ void RS_simulation (const int m,const int k,const double pmin,const double pmax,
     
     if (dec_mas(i)!=mas(i))
     {
-      counter(i)=1.0 ;
+      counter(pi,i)=1.0 ;
     
   }
     
   }
+  cout<<p<<endl;
+
+  }
+
+  for (int pi=0;pi<num_of_p;++pi){
+    n_cor_cws=0;
+    p=pmin+pi*pintv;
 
   for (int i=0;i<temp;++i){
 
-    n_cor_cws=n_cor_cws+counter(i);
-
-      }
-  cout<<"{"<<p<<", "<<n_cor_cws/num_of_cws<<"},";
-   }
-
-   
+    n_cor_cws=n_cor_cws+counter(pi,i);
+ 
+  }
+  cout<<"{"<<p<<", "<<n_cor_cws/num_of_cws<<"},"<<endl;
+     
+  }
+     
    
 double ndou=n*1.0;
  double kdou=k*1.0;
@@ -141,8 +150,10 @@ double ndou=n*1.0;
 
 int main()
 {
-  double pmin=pow(10,-6);
-  double pmax=5*pow(10,-3);
+    double pmin=pow(10,-6);
+   double pmax=5*pow(10,-3);
+  //  double pmin=0.9;
+  // double pmax=1;
   
   double num_of_cws=100.0;
   int num_of_p=20;
@@ -161,11 +172,11 @@ int main()
   }
   
 		    
-  // RS_simulation (8,51,pmin,pmax,num_of_p,num_of_cws);
-  RS_simulation (11,k(3),pmin,pmax,num_of_p,num_of_cws);
-  RS_simulation (12,k(2),pmin,pmax,num_of_p,num_of_cws);
-  RS_simulation (13,k(1),pmin,pmax,num_of_p,num_of_cws);
-  RS_simulation (14,k(0),pmin,pmax,num_of_p,num_of_cws);
+  //  RS_simulation(9,51,pmin,pmax,num_of_p,num_of_cws);
+   RS_simulation (11,k(3),pmin,pmax,num_of_p,num_of_cws);
+    RS_simulation (12,k(2),pmin,pmax,num_of_p,num_of_cws);
+    RS_simulation (13,k(1),pmin,pmax,num_of_p,num_of_cws);
+  //  RS_simulation (14,k(0),pmin,pmax,num_of_p,num_of_cws);
 
 
   
