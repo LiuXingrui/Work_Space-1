@@ -118,8 +118,8 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
   int n,k,d,t,q,num_lbits_RS,L1,L2,i1,i2,i3,d1,d2;
   double num_of_cor_cws=0;
   int temp=num_of_cws;
-  vec   counter(num_of_cws);
-  double x;
+  mat   counter(num_of_p,num_of_cws);
+  double x,p;
   double pintv=(pmax-pmin)/(num_of_p-1);
   // cout<<pintv<<endl;
   RNG_randomize();
@@ -154,16 +154,17 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
     
   Reed_Solomon RS(a,t);
   Hamming_Code  HC(m1);
-
+ counter.zeros();
 
 
   //cout<<"k1="<<k1<<"  k2="<<k2<<"  a="<<a<<endl;
   cout<<"  n_1="<<n1<<", k_1="<<k1<<", d_1= "<<d1<<", n_2="<<n2<<", k_2="<<k2<<", d_2= "<<d2<<", n="<<n<<", k="<<k<<" Product code:ListPlot[{"<<endl;
 
- for (double p=pmin;p<=pmax+0.000000001;p=p+pintv){
+  for (int pi=0;pi<num_of_p;++pi){
+   p=pmin+pi*pintv;
      BSC bsc(p);
      num_of_cor_cws=0;
-     counter.zeros();
+    
             #pragma omp parallel for
   for (int i=0;i<temp;++i){
     mas(i)=randb(k1,a*k2);
@@ -181,16 +182,22 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
   // cout<<rec_mas<<endl;
     if (rec_mas(i)!=mas(i)){
 
-    counter(i)=1.0;
+      counter(pi,i)=1.0;
     //    cout<<counter(i);
 	       
   }
 
   
   }
+  //  cout<<p<<endl;
+  }
+
+  for (int pi=0;pi<num_of_p;++pi){
+    p=pmin+pi*pintv;
+    num_of_cor_cws=0;
   for (int i=0;i<num_of_cws;i++){
     // cout<<counter(i)<<endl;
-    num_of_cor_cws=num_of_cor_cws+counter(i);
+    num_of_cor_cws=num_of_cor_cws+counter(pi,i);
     //  cout<<num_of_cor_cws<<endl;
     
 
