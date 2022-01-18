@@ -123,7 +123,7 @@ void RS_simulation (const int m,const int k,const double pmin,const double pmax,
     }
     
   }
-  cout<<p<<endl;
+  //  cout<<p<<endl;
 
   }
 
@@ -174,7 +174,7 @@ int main()
   }
   
 		    
-  RS_simulation(9,k(2),pmin,pmax,num_of_p,num_of_cws);
+  RS_simulation(9,401,pmin,pmax,num_of_p,num_of_cws);
   //  RS_simulation (11,k(3),pmin,pmax,num_of_p,num_of_cws);
   // RS_simulation (12,k(2),pmin,pmax,num_of_p,num_of_cws);
   //    RS_simulation (13,k(1),pmin,pmax,num_of_p,num_of_cws);
