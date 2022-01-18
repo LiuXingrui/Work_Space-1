@@ -177,6 +177,7 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
     product_encoder (mas(i), k1,cw(i),  L2,RS, HC);
     random_channel (cw(i),cor_cw(i),L1,bsc);
     burst_error_channel( cor_cw(i), p);
+    if (cw(i)!=cor_cw(i)){
 	  
     product_decoder ( L1, L2,cor_cw(i),rec_mas(i),RS, HC);
   // cout<<rec_mas<<endl;
@@ -186,7 +187,7 @@ void product_simulation (const int n1,const int n2,const int k1,const int k2,con
     //    cout<<counter(i);
 	       
   }
-
+    }
   
   }
   //  cout<<p<<endl;
@@ -219,14 +220,14 @@ int main()
   
   double pmax=5*pow(10,-3);
   // cout<<pmax<<endl;
-  double num_of_cws=100.0;
+  double num_of_cws=10000.0;
   int num_of_p=20;
 
   
-  product_simulation (127,15,120,13,4,7,pmin,pmax,num_of_p,num_of_cws);
+  // product_simulation (127,15,120,13,4,7,pmin,pmax,num_of_p,num_of_cws);
     product_simulation (63,15,57,13,4,6,pmin,pmax,num_of_p,num_of_cws);
-      product_simulation (127,31,120,29,5,7,pmin,pmax,num_of_p,num_of_cws);
-        product_simulation (31,15,26,13,4,5,pmin,pmax,num_of_p,num_of_cws);
+    //  product_simulation (127,31,120,29,5,7,pmin,pmax,num_of_p,num_of_cws);
+      //   product_simulation (31,15,26,13,4,5,pmin,pmax,num_of_p,num_of_cws);
     //  cout<<1<<endl;
   
   return 0;
