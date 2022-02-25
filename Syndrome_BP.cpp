@@ -80,7 +80,8 @@ void initialize_errors(const bmat &H, nodes errors[]){
 
     //  cout<<index<<endl;
 }
-void initialize_massages(mat &mcv,mat& mvc, bmat &H){
+/*
+void initialize_massages( &mcv,mat& mvc, bmat &H){
     int r=H.rows();
     int c=H.cols();
     for (int i=0;i<r;i++){
@@ -96,22 +97,22 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
     
   
 }
+*/
 
-
-    void update(nodes checks[],nodes errors[],mat& mcv,mat& mvc,mat& pre_mcv,mat& pre_mvc,const bvec& syndrome,double p,int c, int v,bmat &H){
+   void update(nodes checks[],nodes errors[],Sparse_Mat<double> &mcv,Sparse_Mat<double>& mvc,const bvec& syndrome,double p,int c, int v, const bmat &H){
   for (int i=0;i<c;i++){
     for (int j=0;j<v;j++){
       
       if (H(i,j)==1){
 	
-	//update v-to-c massage:
-	mvc(i,j)=log((1-p)/p);
+	//update all v-to-c massage first:
+	mvc.set(i,j,log((1-p)/p));
       for (int k1=0;k1<errors[j].degree;k1++){
 	int temp=(errors[j].neighbors)(k1);
 	//	cout<<"temp="<<temp<<endl;
 	//	cout<<"i-"<<i<<endl;
 	if (temp!=i){
-	  mvc(i,j)=mvc(i,j)+pre_mcv(temp,j);
+	  mvc.set(i,j,mvc(i,j)+mcv(temp,j));
 	  // cout<<pre_mcv<<endl;
 	  //  cout<<"k1="<<k1<<endl;
 	  // cout<<pre_mcv(k1,j)<<endl;
@@ -119,6 +120,16 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
 	
 	}
       }
+      }
+    }
+  }
+
+  for (int j=0;j<v;j++){
+    double belief_j=log((1-p)/p);
+   for (int i=0;i<c;i++){
+   
+      
+      if (H(i,j)==1){
 
       //update c-to-v massage:
       double temp2=1;
@@ -127,7 +138,7 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
 	int temp=(checks[i].neighbors)(k2);
 	
 	if (temp!=j){
-	  temp2=temp2*tanh(pre_mvc(i,temp)/2);
+	  temp2=temp2*tanh(mvc(i,temp)/2);
 	    //  cout<<pre_mvc<<endl;
 	    // cout<<pre_mvc(i,k2);
 	    // cout<<"temp2="<<temp2<<endl;
@@ -137,16 +148,23 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
       
       if (syndrome(i)==0){
 
-	mcv(i,j)=2*atanh(temp2);
+	mcv.set(i,j,2*atanh(temp2));
       }
 
       else{
-	mcv(i,j)=-2*atanh(temp2);
+	mcv.set(i,j,-2*atanh(temp2));
       }
+
+
       
     
+    
       }
+      
     }
+ 
+   
+   
   }
 
 
@@ -155,8 +173,7 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
   
 }
 
-
-void decode(mat mcv, nodes errors[],bvec& e,double p,int v){
+void decode(Sparse_Mat<double>& mcv, nodes errors[],bmat& e,double p,int v){
   double l_p=log((1-p)/p);
   for (int i=0;i<v;i++){
     double final_l=l_p;
@@ -165,7 +182,7 @@ void decode(mat mcv, nodes errors[],bvec& e,double p,int v){
 
     }
     if (final_l<0){
-      e(i)=1;
+      e(i,0)=1;
     }
 
     
@@ -181,61 +198,109 @@ void decode(mat mcv, nodes errors[],bvec& e,double p,int v){
 int main(){
   GlobalRNG_randomize ();
 
-  int lmax=10;
+  int lmax=1000;
+  int n;
+  int k;
+  int temp;
+  int col_ind=0;
 
-  bmat H="1 1 0;0 1 1";
-    cout<<"H:"<<H<<endl;
+  ifstream parity_check("LDPC_Mat1.txt");
+
+  string line;
+  getline(parity_check, line);
+  istringstream iss(line);
+  iss>>n>>k;
+
+  int v=n;
+  int c=n-k;
+   bmat H(n-k,n);
+    // bmat H="1 1 0;0 1 1";
+  // bmat H= "1 0 0 1 1 1 0;  0 1 0 1 1 0 1;0 0 1 0 1 1 1";
+     v=H.cols();
+     c=H.rows();
+     
+     //     /*
+
+    while( getline(parity_check, line)){
+    istringstream iss2(line);
+    while (iss2>>temp){
+      H(col_ind,temp)=1;
+      //  cout<<temp<<"  ";
+  }
+    // cout<<"\n"<<endl;
+    col_ind++;
+  }
+
+    //  Sparse_Mat<bin> SH(H);
+    //   cout<<SH<<endl;
+
+    //	  */
+     
+  //  cout<<1<<endl;
+  parity_check.close();
+  //  cout<<2<<endl;
+ 
+  // cout<<"H:"<<H<<endl;
 
   for (int s=0;s<10;s++){
-    double p=0.1;
+    double p=0.01;
     //  bmat H=randb(3,5);
   
     bvec syndrome;
-    int c=H.rows();
-    int v=H.cols();
+    
     nodes  checks[c];
     nodes  errors[v];
+    bmat syndromeT(c,1);
     int E=0;
     initialize_checks (H, checks,  E);
-    mat mcv(c,v);
-    mat mvc(c,v);
+    Sparse_Mat<double> mcv(c,v);
+    Sparse_Mat<double> mvc(c,v);
     mcv.zeros();
     mvc.zeros();
     initialize_errors(H, errors);
-    mat pre_mcv=mcv;
-    mat pre_mvc=mvc;
+  
 
        syndrome=randb(c);
+        for (int i=0;i<c;i++){
+
+	 
+	 syndromeT(i,0)=syndrome(i);
+
+	 
+       }
+
       // syndrome="0 1";
-      bvec e(v);
+	bmat e(v,1);
       e.zeros();
       
       for (int l=1;l<=lmax;l++){
 	//  cout<<l<<endl;
-	update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,p, c, v,H);
-	
+	update(checks,errors, mcv,mvc,syndrome,p, c, v,H);
+	  decode(mcv,  errors, e, p, v);
 	//	if (syndrome=="0 1"){
 	
 	//	  cout<<"c to v:"<<mcv<<"\n<<"<<endl;
 	//	  cout<<"v to c:"<<mvc<<"\n<<"<<endl;
 	//	}
 	
-	if(mcv==pre_mcv&&mvc==pre_mvc){
-	  cout<<"success! iteration number="<<l<<endl;
+	if(H*e==syndromeT){
+	  cout<<"success! iteration number="<<l-1<<endl;
 	  	  break;
 	}
     
 	//update pre_massage:
+	   if(l==lmax){
 
-	pre_mcv=mcv;
-	pre_mvc=mvc;
+	cout<<"failure"<<endl;
       }
-  
+
+      }
+   
     
-      decode(mcv,  errors, e, p, v);
+  
       //  cout<<"H:"<<H<<endl;
-      cout<<"syndrome: "<<syndrome<<endl;
-      cout<<"e:"<<e<<endl;
+      //  cout<<"syndrome: "<<syndrome<<endl;
+      // cout<<"e:"<<e<<endl;
   }
   
 }
@@ -246,3 +311,4 @@ int main(){
     
 
  
+
