@@ -58,6 +58,7 @@ int main(){
 
   nodes  checks[c];
   nodes  errors[v];
+	
   BSC bsc(p);
   int E=0;
   initialize_checks (H, checks,  E);
