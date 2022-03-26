@@ -11,19 +11,22 @@ using namespace std;
 #include <itpp/itbase.h>
 #include <itpp/itcomm.h>
 using namespace itpp;
+//compile: g++   `pkg-config --cflags itpp` -o my_prog BP.cpp  BP1.cpp `pkg-config --libs itpp`
+// format : ./my_prog file_name error_propability number_of_cordwords max_iteration
 
 int main(int argc, char **argv){
   double p;
   int num_of_cws;
   string file_name;
   int lmax;
+  //get the parameters:
+  
   if (argc >= 2)
     {
         file_name=argv[1];
 	if (argc>=3)
 	  {
-        istringstream argv2( argv[2] );
-	
+        istringstream argv2( argv[2] );	
 	if ( argv2 >> p){}
 	else
 	  {
@@ -36,7 +39,7 @@ int main(int argc, char **argv){
 	    if ( argv3 >> num_of_cws){}
 	    else
 	      {
-		cout<<"num_of_cws should be a int"<<endl;
+		cout<<"num_of_cws should be an int"<<endl;
 		return 1;
 	      }
 	    if (argc>=5)
@@ -45,7 +48,7 @@ int main(int argc, char **argv){
 		  if ( argv4 >> lmax){}
 		  else
 		    {
-		      cout<<"lmax should be a int"<<endl;
+		      cout<<"lmax should be an int"<<endl;
 		      return 1;
 		    }
 		if (argc>=6)
@@ -69,8 +72,7 @@ int main(int argc, char **argv){
 
 	  }
 	else
-	  {
-	 
+	  {	 
 	    p=0.01;
 	    num_of_cws=10000;
 	    lmax=20;
@@ -85,9 +87,10 @@ int main(int argc, char **argv){
     }
 
   GlobalRNG_randomize ();
-  double num_iter=0.0;
-  int num_of_suc_dec=0;
-  int n_valid_cws=0;
+ 
+  double num_iter=0.0; //for calculate average iterations
+  int num_of_suc_dec=0;// number of successfully decoded results
+  int n_valid_cws=0;  // number of  decoded results that are cordwords
 
 
   //read the parity check matrix:
@@ -129,22 +132,22 @@ int main(int argc, char **argv){
   nodes  errors[v];
   BSC bsc(p);
   int E=0;
+  //find the neighbourhoods of all nodes:
   initialize_checks (H, checks,  E);
   initialize_errors(H, errors);
-  //er is the number of bits that are wrong after decoding
-  int er=0;
+
+  int er=0;  //er is the number of bits that are wrong after decoding
   
   for (int s=0;s<num_of_cws;s++)
-    {
-      
-      bvec real_eT(v);
-      bmat zero_mat1(c,1);
+    {     
+      bvec real_eT(v);    //the transposed error vector, which is a row vector. 
+      bmat zero_mat1(c,1); 
       bvec zero_vec(v);
       zero_vec.zeros();
       zero_mat1.zeros();
       
       real_eT=bsc(zero_vec);
-      bmat real_e(v,1);
+      bmat real_e(v,1);  //the error vector which is a column vector,
       bmat zero_mat2(v,1);
       zero_mat2.zeros();
       
@@ -153,7 +156,8 @@ int main(int argc, char **argv){
 	  real_e(q,0)=real_eT(q);
 	}
       bmat syndrome=H*real_e;
-      
+
+      //is the syndrome a zero vector?
       if (syndrome==zero_mat1)
 	{
 	  n_valid_cws++;
@@ -170,9 +174,10 @@ int main(int argc, char **argv){
 	    } 
 	  continue;   
 	}
-      mat mcv(c,v);
-      mat mvc(c,v);
-      initialize_massages( mcv,mvc, H);
+   
+      mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
+      mat mvc(c,v);   // the messages from variable nodes to check nodes
+      initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
       bmat output_e(v,1);
       output_e.zeros();
       
