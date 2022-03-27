@@ -13,6 +13,8 @@ using namespace std;
 using namespace itpp;
 //compile: g++   `pkg-config --cflags itpp` -o my_prog BP.cpp  BP1.cpp `pkg-config --libs itpp`
 // format : ./my_prog file_name error_propability number_of_cordwords max_iteration
+//the format for the parity check file: the first row is n n-k,  then the sparse matrix. Notice
+// the first element stored in the file is 1 rathar than 0.
 
 int main(int argc, char **argv){
   double p;
@@ -213,7 +215,7 @@ int main(int argc, char **argv){
   cout<<"and there are "<< n_valid_cws<<" decoding results are codewords"<<endl;
   cout<<"bit error rate after decoding is ";
   cout<<er/(1.0*n*num_of_cws)<<endl;
-  cout<< "number of real_error=0:    "<<num_zero_cws<<endl;
+  cout<< "number of zero errors:    "<<num_zero_cws<<endl;
   cout<<"average iterations:"<<endl;
   cout<<num_iter/num_of_cws<<endl;
   return 0;
