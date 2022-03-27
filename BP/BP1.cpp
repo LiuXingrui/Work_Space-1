@@ -28,10 +28,8 @@ void initialize_checks (const bmat &H, nodes checks[], int & E){
 	checks[i].degree++;
 	(checks[i].neighbors).ins(0,j);
 	E++;
-      }
-     
-    }
-    
+      }     
+    }    
   }
 }
 
@@ -122,24 +120,21 @@ void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
 	 final_pr=ipr;
 
 	 //ci is the ith neibor of vj:
-	   for (int i=0;i<vj_degree;i++)
-     {
-       
-       //  update the  v_j to c_i massage:      
-        int ci=(errors[j].neighbors)(i);
-	update_vj_to_ci(checks, errors,mcv, mvc,j,ci, ipr);
-
-      // update all  c_i to v_k massages:          
-	int ci_degree=checks[ci].degree;
-	for (int k=0;k<ci_degree;k++)
-	  {
-	    int vk=(checks[ci].neighbors)(k);
-	    update_ci_to_vj( checks, errors,mcv, mvc,ci,vk,syndrome(ci,0));	    
-	  }
-	final_pr=final_pr*mcv(ci,j);      
-     } 
-   	   //  cout<<j<<"   "<<final_pr<<endl;
-	   output_e(j,0)=final_pr<1? 1:0;      
+	 for (int i=0;i<vj_degree;i++)
+	   {
+	     //  update the  v_j to c_i massage:      
+	     int ci=(errors[j].neighbors)(i);
+	     update_vj_to_ci(checks, errors,mcv, mvc,j,ci, ipr);          
+	   }
+	 
+	 for (int i=0;i<vj_degree;i++)
+	   {     
+	     int ci=(errors[j].neighbors)(i);
+	     update_ci_to_vj( checks, errors,mcv, mvc,ci,j,syndrome(ci,0));	   // update all  c_i to v_j massages         
+	     final_pr=final_pr*mcv(ci,j);      
+	   } 
+	 //  cout<<j<<"   "<<final_pr<<endl;
+	 output_e(j,0)=final_pr<1? 1:0;      
       }  
 }
 
