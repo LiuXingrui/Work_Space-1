@@ -82,7 +82,7 @@ int main(int argc, char **argv){
     }
   else
     {
-       file_name="LDPC_Mat2.txt";
+       file_name="M2";
        p=0.01;
        num_of_cws=10000;
        lmax=20;
@@ -124,8 +124,15 @@ int main(int argc, char **argv){
     {
       istringstream iss2(line);
       while (iss2>>temp){
-	H(col_ind,temp-1)=1;   
-      }
+	if (temp>=1&&temp<=n)
+	  {
+	    H(col_ind,temp-1)=1;
+	  }
+	else
+	  {
+	    cout<<"the format of the parity check is wrong, the first element is 1 rathar than 0"<<endl;
+	    return 1;
+	  }
       col_ind++;
     }
 
