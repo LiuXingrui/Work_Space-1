@@ -102,7 +102,7 @@ int main(int argc, char **argv){
   int r;
   int &c=r;
   int temp;
-  int col_ind=0;
+  int row_ind=0;
   int num_zero_cws=0;
 
   ifstream parity_check(file_name);
@@ -124,9 +124,9 @@ int main(int argc, char **argv){
     {
       istringstream iss2(line);
       while (iss2>>temp){
-	if (temp>=1&&temp<=n)
+	if (temp>=1&&temp<=n&&row_ind<r)
 	  {
-	    H(col_ind,temp-1)=1;
+	    H(row_ind,temp-1)=1;
 	  }
 	else
 	  {
@@ -135,7 +135,7 @@ int main(int argc, char **argv){
 	  }
 	
       }
-		  col_ind++;
+		  row_ind++;
     }
   parity_check.close();
   nodes  checks[c];
