@@ -68,7 +68,7 @@ int main(int argc, char **argv){
 	  }
 	else
 	  {
-	    num_of_cws=1000;
+	    num_of_cws=10000;
 	    lmax=20;
 	  }
 
@@ -194,7 +194,7 @@ int main(int argc, char **argv){
       for (int l=1;l<=lmax;l++)
 	{
 	  //  cout<<l<<endl;
-	  s_update(checks,errors, mcv,mvc,syndrome,p, c, v,output_e);
+	  p_update(checks,errors, mcv,mvc,syndrome,p, c, v,output_e);
 	  
 	  if (H*output_e==syndrome)
 	    {
