@@ -133,8 +133,9 @@ int main(int argc, char **argv){
 	    cout<<"the format of the parity check is wrong, the first element is 1 rathar than 0"<<endl;
 	    return 1;
 	  }
-	col_ind++;
+	
       }
+		  col_ind++;
     }
   parity_check.close();
   nodes  checks[c];
