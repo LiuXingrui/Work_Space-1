@@ -143,6 +143,7 @@ int main(int argc, char **argv){
   initialize_errors(H, errors);
 
 //only for 1 bit error -0331
+    cout<<"lmax="<<lmax<<endl;
   for (int s=0;s<n;s++)
     {     
       bvec real_eT(v);    //the transposed error vector, which is a row vector. 
@@ -172,6 +173,7 @@ int main(int argc, char **argv){
       bmat output_e(v,1);
       output_e.zeros();
       cout<<"\n for parallel:"<<endl;
+    
       for (int l=1;l<=lmax;l++)
 	{
 	  cout<<"\n iteration "<<l<<": \n"<<endl;
@@ -182,10 +184,10 @@ int main(int argc, char **argv){
 	  
 	  if (H*output_e==syndrome)
 	    {
-	      cout<<"\n output_e: \n"<<output_e<<endl;
+	      cout<<"get the right syndrome \n output_e: \n"<<output_e<<endl;
 	      break;	  
 	    }
-	  if(l=lmax){cout<<"\n failed "<<endl;}
+	  if(l==lmax){ cout<<"failed \n output_e: \n"<<output_e<<endl;}
 
 	}
 
@@ -203,10 +205,10 @@ int main(int argc, char **argv){
 	  
 	  if (H*output_e==syndrome)
 	    {
-	      cout<<"\n output_e: \n"<<output_e<<endl;
+	      cout<<"\n get the right syndrome output_e: \n"<<output_e<<endl;
 	      break;	  
 	    }
-	  if(l=lmax){cout<<"\n failed "<<endl;}
+	  if(l==lmax){  cout<<"\n output_e: \n"<<output_e<<endl;cout<<"\n failed "<<endl;}
 
 	}
     }
