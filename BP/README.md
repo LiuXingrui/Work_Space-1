@@ -20,6 +20,8 @@ M2, M3... are some matrices from MayKay's website.
 BP_analysis.cpp will output all the messages after each iteration.  
   bptest is the executable program.  
   `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
+  
+  gen_surface_star will generate a parity check matrix for surface code.
 
   
 
