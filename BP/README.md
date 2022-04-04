@@ -5,12 +5,12 @@ cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To
 ./cla_parallel  <file stored a parity check matrix> <error probability> <number of codewords> <max  iterations>
 An example for the parity check matrix file:
   
-3 2
-1 2 
-2 3
- Which is the matrix:
-  1 1 0
-  0 1 1
+3 2  
+1 2   
+2 3  
+ Which is the matrix:  
+  1 1 0  
+  0 1 1  
   
 The first line is n n-k, then is the sparse matrix form. The first element is labeled 1 rather than 0.
   
