@@ -15,6 +15,6 @@ An example for the parity check matrix file:
 The first line is n n-k, then is the sparse matrix form. The first element is labeled 1 rather than 0.
   
  For more details, see 
-  https://www.overleaf.com/read/gkwhwsdwrjsj
+  https://www.overleaf.com/read/gkwhwsdwrjsj  
   The notes are not finished yet.
   
