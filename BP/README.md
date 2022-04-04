@@ -1,6 +1,6 @@
 original_BP will randomly generate some error vectors and decode them by belief propagation.  
   To compile, use   
-`g++   `pkg-config --cflags itpp` -o prog_name original_BP.cpp  BP_basic_func1.cpp  `pkg-config --libs itpp`  `
+`g++   \`pkg-config --cflags itpp\` -o prog_name original_BP.cpp  BP_basic_func1.cpp  \`pkg-config --libs itpp\`  `
 
 cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
 
