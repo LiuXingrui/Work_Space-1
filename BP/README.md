@@ -4,7 +4,7 @@ g++   `pkg-config --cflags itpp` -o prog_name original_BP.cpp  BP_basic_func1.cp
 
 cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
 
-./cla_parallel  <file_name which stored a parity check matrix> <error probability> <number of codewords> <max  iterations>
+./cla_parallel  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>
  
 An example for the parity check matrix file:
   
