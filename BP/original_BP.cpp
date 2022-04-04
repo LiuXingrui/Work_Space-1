@@ -6,6 +6,7 @@
 #include <math.h> 
 #include <random>
 #include"BP_header.h"
+#include <sstream>
 
 using namespace std;
 #include <itpp/itbase.h>
