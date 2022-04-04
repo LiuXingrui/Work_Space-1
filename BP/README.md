@@ -2,7 +2,7 @@ original_BP will randomly generate some error vectors and decode them by belief 
 
 The executable programs cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
 
-c
+  `./cla_myparallel  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
  
 An example for the parity check matrix file:
   
