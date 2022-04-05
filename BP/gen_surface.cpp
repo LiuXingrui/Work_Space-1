@@ -38,7 +38,11 @@ int main(int argc, char **argv){
     {
       for (int i=1; i<=L;i++)
 	{
-	  Hx<<i+2*L*j<<" "<<i%L+1+2*L*j<<" "<<((i-L+n)%n+2*L*j-1+n)%n+1<<" "<<(i+L)%n+2*L*j<<endl;
+	  if ((i!=L)||(j!=L-1))
+	    {
+	      Hx<<i+2*L*j<<" "<<i%L+1+2*L*j<<" "<<((i-L+n)%n+2*L*j-1+n)%n+1<<" "<<(i+L)%n+2*L*j<<endl;
+	    }
+	  
 	}
     }
   
