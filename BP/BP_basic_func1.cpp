@@ -108,6 +108,43 @@ void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
 }
 
 
+void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
+  
+  double ipr=(1-p)/p;
+  pre_mcv=mcv;
+  pre_mvc=mvc;
+
+  for (int i=0;i<c;i++)
+    {
+      int ci_degree=checks[i].degree;
+      
+      	//update all v-to-ci massages first:
+    for (int j=0;j<ci_degree;j++)
+      {            
+	int vnode=(checks[i].neighbors)(j);
+       
+	update_vj_to_ci(checks, errors,pre_mcv, mvc,vnode,i, ipr);	
+      }
+    }
+    //update c-to-vj massages:
+  for (int j=0;j<v;j++)
+    {
+   int vj_degree=errors[j].degree;
+   double  final_pr=ipr;
+
+   for (int i=0;i<vj_degree;i++)
+     {
+       int cnode=(errors[j].neighbors)(i);
+       update_ci_to_vj( checks, errors,mcv, pre_mvc,cnode,j,syndrome(cnode,0));
+
+       final_pr=final_pr*mcv(cnode,j);
+      }   
+       //  cout<<j<<"   "<<final_pr<<endl;
+       output_e(j,0)=final_pr<1? 1:0;      
+    }
+ 
+}
+
 void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
   
     double ipr=(1-p)/p; //initial p0/p1
@@ -137,6 +174,7 @@ void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
 	 output_e(j,0)=final_pr<1? 1:0;      
       }  
 }
+
 
 
 void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int i,int j,bin s)
@@ -199,3 +237,109 @@ void print_error_pos( const bmat &real_e,int n){
     }
 }
   
+
+bmat read_matrix (int& n,int &r, string & file_name){
+  ifstream parity_check(file_name);
+  string line;
+  int row_ind=0;
+  int temp;
+  getline(parity_check, line);
+  istringstream iss(line);
+  
+  if(  iss>>n>>r) {}
+  else
+    {
+      cout<<"did not open the right parity check file"<<endl;
+      
+    }
+ 
+  bmat H(r,n);
+
+  while( getline(parity_check, line))
+    {
+      istringstream iss2(line);
+      while (iss2>>temp){
+	if (temp>=1&&temp<=n&&row_ind<r)
+	  {
+	    H(row_ind,temp-1)=1;
+	  }
+	else
+	  {
+	    cout<<"the format of the parity check is wrong, the first element is 1 rathar than 0"<<endl;
+	    
+	  }
+	
+      }
+		  row_ind++;
+    }
+  parity_check.close();
+
+  return H;
+
+  
+}
+
+
+void write_matrix(string file_name, bmat &H){
+
+  ofstream Hx;
+  Hx.open (file_name,ios::trunc);
+  int n=H.cols();
+  int r=H.rows();
+
+
+  Hx<<n<<" "<<r<<endl;
+
+  for (int j=0;j<r;j++)
+    {
+      for (int i=0; i<n;i++)
+	{
+	  if (H(j,i)!=0)
+	    {
+	      Hx<<i+1<<" ";
+	    }
+	  
+	}
+      Hx<<endl;
+    }
+  
+
+  Hx.close();
+
+}
+
+
+bmat merge_mat_hori(const bmat &left,const bmat &right){
+
+  if (left.rows()!=right.rows())
+    {
+      cout<<"the 2 matrices cannot merge horizontally"<<endl;
+      bmat error(1,1);
+      error.zeros();
+      return error;
+    }
+
+  else
+    {
+      int r=left.rows();
+      int c=left.cols()+right.cols();
+      int c1=left.cols();
+      int c2=right.cols();
+      bmat m(r,c);
+
+      for (int i=0;i<r;i++)
+	{
+	  for (int j1=0;j1<c1;j1++){
+	    m(i,j1)=left(i,j1);
+	  }
+	  for (int j2=0;j2<c2;j2++){
+	    m(i,c1+j2)=right(i,j2);
+	  }
+	  
+	}
+       return m;
+    }
+
+ 
+
+}
