@@ -21,7 +21,9 @@ BP_analysis.cpp will output all the messages after each iteration.
   bptest is the executable program.  
   `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
   
-  gen_surface_star will generate a parity check matrix for surface code.
+  gen_HPC.cpp will generate Hx and Hz for hypergraph product code.  
+  ' ./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>
+ 
 
   
 
