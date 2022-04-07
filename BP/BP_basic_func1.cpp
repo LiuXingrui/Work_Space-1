@@ -72,7 +72,7 @@ void initialize_massages(mat &mcv,mat& mvc, bmat &H){
     }  
 }
 
-
+//in fact, it is a sequential update schedule.
 void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
   
     double ipr=(1-p)/p;
@@ -107,7 +107,7 @@ void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
     }  
 }
 
-
+//the parallel schedule
 void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
   
   double ipr=(1-p)/p;
@@ -145,6 +145,7 @@ void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,m
  
 }
 
+//the sequential schedule from that paper
 void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
   
     double ipr=(1-p)/p; //initial p0/p1
@@ -176,7 +177,7 @@ void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
 }
 
 
-
+//update ci to vj massage:
 void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int i,int j,bin s)
 {
    int c_degree=checks[i].degree;
@@ -193,6 +194,7 @@ void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
      mcv.set(i,j,s==0? (1+temp)/(1-temp):(1-temp)/(1+temp));
 }
 
+//update vj to ci massage:
 void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int j,int i,double ipr){
   
    int v_degree=errors[j].degree;
@@ -237,7 +239,7 @@ void print_error_pos( const bmat &real_e,int n){
     }
 }
   
-
+//read a parity check matrix
 bmat read_matrix (int& n,int &r, string & file_name){
   ifstream parity_check(file_name);
   string line;
@@ -279,7 +281,7 @@ bmat read_matrix (int& n,int &r, string & file_name){
   
 }
 
-
+//write a matrix to a file
 void write_matrix(string file_name, bmat &H){
 
   ofstream Hx;
@@ -308,7 +310,7 @@ void write_matrix(string file_name, bmat &H){
 
 }
 
-
+//merge 2 matrices horizontally, [H1,H2]
 bmat merge_mat_hori(const bmat &left,const bmat &right){
 
   if (left.rows()!=right.rows())
