@@ -22,7 +22,7 @@ BP_analysis.cpp will output all the messages after each iteration.
   `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
   
   gen_HPC.cpp will generate Hx and Hz for hypergraph product code.  
-  ' ./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>'
+  `./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>`
  
 
   
