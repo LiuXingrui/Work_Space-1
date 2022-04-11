@@ -57,7 +57,7 @@ void initialize_errors(const bmat &H, nodes errors[]){
 }
 
 //initialize massages to all-one matrices
-void initialize_massages(mat &mcv,mat& mvc, bmat &H){
+void initialize_massages(mat &mcv,mat& mvc,const bmat &H){
     int r=H.rows();
     int c=H.cols();
     for (int i=0;i<r;i++)
@@ -210,8 +210,81 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
      }   
 }
 
+
+int  cla_decode(int v,int c,const bmat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p){
+
+  int n=v;
+  bvec real_eT(v);    //the transposed error vector, which is a row vector.
+ 
   
-//the distance between 2 cws
+  //if no error, break
+  bvec zero_vec(v);
+  zero_vec.zeros();
+  real_eT=bsc(zero_vec);
+  if (real_eT==zero_vec)
+    {
+      // cout<<"zero"<<endl;
+      return 1;
+    }
+  
+  bmat zero_mat1(c,1);
+  bmat zero_mat2(v,1);
+  zero_mat1.zeros();
+  zero_mat2.zeros();
+  bmat real_e(v,1);  //the error vector which is a column vector,
+     
+  for (int q=0;q<v;q++)
+    {
+      real_e(q,0)=real_eT(q);
+    }
+  bmat syndrome=H*real_e;
+
+  //is the syndrome a zero vector?
+  if (syndrome==zero_mat1)
+	{
+	  // is e a stablizer?	    
+	  er=er+ distance(zero_mat2, real_e, n);
+	  return 0;	 
+	  // cout<<"failure! error= some codeword"<<endl;	   
+	}
+   
+      mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
+      mat mvc(c,v);   // the messages from variable nodes to check nodes
+      initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
+      bmat output_e(v,1);
+      output_e.zeros();
+      
+      for (int l=1;l<=lmax;l++)
+	{
+	  //  cout<<l<<endl;
+	  p_update(checks,errors, mcv,mvc,syndrome,p, c, v,output_e);
+	  
+	  if (H*output_e==syndrome)
+	    {
+	      num_iter=num_iter+l;
+	     
+	      if(output_e==real_e)
+		{
+		  return 1;
+		  // cout<<"success! iteration number="<<l<<endl;
+		  // num_of_suc_dec++;
+		  //  cout<<num_of_suc_dec<<endl;
+		}
+	      else
+		{
+		  er=er+ distance(output_e, real_e, n);	  
+		  return 0;		       
+		}	    	  
+	    }
+	  if(l==lmax)
+	    {
+	    er=er+ distance(output_e, real_e, n);
+	    num_iter=num_iter+l;
+	    return 0;	   	 
+	    }
+	}
+ }
+  //the distance between 2 cws
 int distance(const bmat &output_e, const bmat &real_e,int n){
   
   int er=0;

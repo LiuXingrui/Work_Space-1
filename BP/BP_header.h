@@ -29,7 +29,7 @@ void initialize_checks (const bmat &H, nodes checks[], int & E);
 void initialize_errors(const bmat &H, nodes errors[]);
 
 //initialize massages to all-one matrices
-void initialize_massages(mat &mcv,mat& mvc, bmat &H);
+void initialize_massages(mat &mcv,mat& mvc,const bmat &H);
 
 //do a  parallel update 
 void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e);
@@ -59,3 +59,5 @@ bmat read_matrix (int& n,int &r, string & file_name);
 bmat merge_mat_hori(const bmat &left,const bmat &right);
 
 void write_matrix(string file_name, bmat &H);
+
+int  cla_decode(int v,int c,const bmat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p);
