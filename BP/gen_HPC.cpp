@@ -5,7 +5,7 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
-#include"BP_header.h"
+#include"BP_basic_func1.h"
 #include <sstream>
 
 using namespace std;
