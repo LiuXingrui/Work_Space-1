@@ -5,7 +5,7 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
-#include"BP_quantum_header.h"
+#include"BP_quantum_func1.h"
 #include <sstream>
 
 using namespace std;
