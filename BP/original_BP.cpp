@@ -130,7 +130,7 @@ int main(int argc, char **argv){
   cout<<er/(1.0*n*num_of_cws)<<endl;
   // cout<< "number of zero errors:    "<<num_zero_cws<<endl;
   cout<<"average iterations:"<<endl;
-  cout<<num_iter/num_of_cws<<endl;
+  cout<<num_iter/num_of_suc_dec<<endl;
   return 0;
 }
 
