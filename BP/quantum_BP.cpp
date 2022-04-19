@@ -107,23 +107,18 @@ int main(int argc, char **argv){
 
   bmat Hx=read_matrix ( n1,r1, file_name);
   bmat Hz=read_matrix ( n2,r2, file_name2);
-    cout<<"rx="<<rx<<endl;
-  cout<<"rz="<<rz<<endl;
+  
   //are the parity check matrices right?
   if (n1!=n2){cout<<"nx!=nz, the two matrices donot match"<<endl;return 1;}  
   n=n1;
   r=r1+r2;
   int rankx=bmat_rank(Hx);
   int rankz=bmat_rank(Hz);
-  // cout<<"rankx:"<<rankx<<endl;
-  //cout<<"rankz:"<<rankz<<endl;
   k=n-rankx-rankz;
   bmat zero_mat1(r1,r2);
   zero_mat1.zeros();
   
-  //  cout<<"Hx:"<<Hx<<endl;
-  // cout<<"Hz:"<<Hz<<endl;
-  // cout<<Hx*transpose(Hz)<<endl;
+
   if((Hx*transpose(Hz))!=zero_mat1) {cout<<"Hx*Hz^T!=0, the two matrices donot match"<<endl;return 1;}
 
   

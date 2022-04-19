@@ -13,3 +13,6 @@ qtest1: quantum_test1.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 
 cla_BP:BP_basic_func1.cpp original_BP.cpp
 	g++   `pkg-config --cflags itpp` -o new_sequential original_BP.cpp  BP_basic_func1.cpp  `pkg-config --libs itpp`
+
+quan_BP:quantum_BP.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		g++   `pkg-config --cflags itpp` -o qBP quantum_BP.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
