@@ -23,6 +23,10 @@ BP_analysis.cpp will output all the messages after each iteration.
   
   gen_HPC.cpp will generate Hx and Hz for hypergraph product code.  
   `./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>`
+  
+  
+  qBP will decode CSS code with error probability distributed between 0.5p and 1.5p:
+  `./qBP <Hx_file> <Hz_file> <p> <number of codewords><lmax>`
  
 
   
