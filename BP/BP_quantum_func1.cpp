@@ -12,9 +12,12 @@ using namespace std;
 #include <itpp/itbase.h>
 #include <itpp/itcomm.h>
 using namespace itpp;
-
+  GF2mat  T;
+  GF2mat  U;
+  ivec    P; 
 
 void error_channel(bvec &cw, const vec &p){
+  
   int temp=1e8;
   int temp2;
   bin one=1;
@@ -31,7 +34,8 @@ void error_channel(bvec &cw, const vec &p){
 	    cw[i]=cw[i]+one;
 	  }	
       }
-  }  
+  }
+  
 }
 
 
@@ -50,9 +54,12 @@ void pro_dist(double p, vec& pv){
     }
 }
 
-bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int&num){
-
+bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int rank2){
+  int v=H.cols();
+  int c=H.rows();
+  int r2=H2.rows();
   bvec real_eT(v);    //the transposed error vector, which is a row vector.
+  real_eT.zeros();
   error_channel(real_eT, pv);
    
 
@@ -64,7 +71,7 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
 	 
       return true;
     }
-  
+ 
   bmat zero_mat1(c,1);
   bmat zero_mat2(v,1);
   zero_mat1.zeros();
@@ -75,13 +82,14 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
     {
       real_e(q,0)=real_eT(q);
     }
+  
   bmat syndrome=H*real_e;
 
   //is the syndrome a zero vector?
   if (syndrome==zero_mat1)
 	{
 	  // is e a stablizer?
-	  if (Q_inspan(real_eT,H2,c){return true;}        
+	  if (Q_inspan(real_eT,H2,rank2)){return true;}        
 	  else  
 	    {
 	      return false;
@@ -89,7 +97,7 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
 	      // cout<<"failure! error= some codeword"<<endl;
 	    }  
 	}
-   
+  
       mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
       mat mvc(c,v);   // the messages from variable nodes to check nodes
       initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
@@ -105,7 +113,7 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
 	    {
 	      num_iter=num_iter+l;
 	     
-	      if(quan_check(output_e,real_e,H2,c,v))
+	      if(quan_check(output_e,real_e,H2,c,rank2))
 		{
 		  return true;
 		  // cout<<"success! iteration number="<<l<<endl;
@@ -120,6 +128,7 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
 	    }
 	  if(l==lmax)
 	    {
+	    
 	    num_iter=num_iter+l;
 	    return false;
 	    // er=er+ distance(output_e, real_e, n);	 
@@ -148,7 +157,7 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
   for (int j=0;j<v;j++)
     {
    int vj_degree=errors[j].degree;
-   double  final_pr==(1-pv[j])/pv[j];
+   double  final_pr=(1-pv[j])/pv[j];
 
    for (int i=0;i<vj_degree;i++)
      {
@@ -163,28 +172,37 @@ bool  quan_decode(int v,int c,const bmat &H,const bmat &H2,const nodes checks[],
 }
 
   //check if real_e is a stabilizer
-bool Q_inspan(bvec &real_eT,bmat &H2,int r){
-  int ori_rank=rank(H2);
-  H2.ins_row (r, real_eT);
-  int i=rank(H2);// the argument is const bmat&, so I guess itpp will creat a new matrix to do the Gaussian elimination, which will waste some time.
-  H2.del_row ( r);
+  bool Q_inspan(bvec &real_eT,bmat &H2,int ori_rank){
+    int r=H2.rows();
+    H2.ins_row (r, real_eT);    
+    int i=bmat_rank(H2);
+     H2.del_row ( r);
   
-  if (i==ori_rank){return true;}
-  else if (i==ori_ran+1){return false;}
-  else {cout<<"some wrong happened with the Q_inspan func"<<endl;return false;}
+    if (i==ori_rank){return true;}
+    else if (i==ori_rank+1){return false;}
+    else {cout<<"some wrong happened with the Q_inspan func"<<endl;return false;}
   
 
 }
 
 //check if real_e-output_e is a stabilizer
- bool quan_check(bmat &output_e,bmat &real_e,bmat &H2,int r,int n){
+  bool quan_check(bmat &output_e,bmat &real_e,bmat &H2,int n,int rank2){
+    
    bvec difference(n);
-   for (i=0;i<n;i++)
+   for (int i=0;i<n;i++)
      {
-       difference(i)=output_e(i,0)-real_e(i,0);
+       difference(i)=output_e(i,0)+real_e(i,0);       
      }
-   return Q_inspan(difference,H2,r);
-
-
-  
+    
+   return Q_inspan(difference,H2,rank2);
  }
+
+
+
+//get the rank of H and gaussian eliminate H:
+int bmat_rank(bmat& H){
+
+  GF2mat Hp(H);
+
+  return Hp.T_fact(T,U,P);	
+}
