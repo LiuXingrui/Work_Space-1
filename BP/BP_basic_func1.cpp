@@ -329,7 +329,7 @@ bmat read_matrix (int& n,int &r, string & file_name){
     }
  
   bmat H(r,n);
-
+  H.zeros();
   while( getline(parity_check, line))
     {
       istringstream iss2(line);
