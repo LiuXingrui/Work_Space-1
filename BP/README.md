@@ -29,7 +29,7 @@ BP_analysis.cpp will output all the messages after each iteration.
   `./qBP <Hx_file> <Hz_file> <p> <number of codewords><lmax>`
  
 
-  gen_cyclic.cpp will create parity check matrix file for a cyclic code:
+  gen_cyclic.cpp will create a rank=r-1 parity check matrix file for a cyclic code, r is the number of rows:
   `./gen_cyc <file for storing> <n> <h_k> <h_k-1> ...<h_0>`
 
 
