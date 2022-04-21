@@ -139,7 +139,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	    }
 	  
 	}
-       num_iter=num_iter+lmax;
+      
        return false;
  }
 
