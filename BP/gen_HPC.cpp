@@ -13,7 +13,8 @@ using namespace std;
 #include <itpp/itcomm.h>
 using namespace itpp;
 
-
+//Hx=I prod H1,H2 prod I
+//Hz=H2^T prod I, I prod H1^T
 int main (int argc, char **argv){
 
   if (argc!=5){
@@ -33,9 +34,12 @@ int main (int argc, char **argv){
   
   bmat H1T=transpose(H1);
   bmat H2T=transpose(H2);
-  
-  k1=n1-r1;
-  k2=n2-r2;
+
+  // int thr_n=r1*n2+r2*n1;
+  // int s1,s2;
+  // s1=n1-r1;
+  // s2=n2-r2;
+
   //Identity matrices:
   bmat I_r1=eye_b (r1);
   bmat I_r2=eye_b (r2);
@@ -51,10 +55,12 @@ int main (int argc, char **argv){
   bmat Hx=merge_mat_hori(Hx_left,Hx_right);
   bmat Hz=merge_mat_hori(Hz_left,Hz_right);
 
+  // n=Hx.rows();
+  //if (n!=thr_n){cout<<"n!=thr_n, something is wrong"<<endl;}
   //test if they are orthogonal
-  if (n1<10&&n2<10){
-    cout<<Hx*transpose(Hz)<<endl;
-  }
+  // if (n1<10&&n2<10){
+  //    cout<<Hx*transpose(Hz)<<endl;
+  //  }
 
   write_matrix(Hx_file, Hx);
   write_matrix(Hz_file,Hz);
