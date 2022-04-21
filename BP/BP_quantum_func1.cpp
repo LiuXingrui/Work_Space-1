@@ -5,8 +5,19 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
-#include"BP_quantum_func1.h"
 #include <sstream>
+
+#ifndef basic
+#define basic
+#include"BP_basic_func1.h"
+#endif
+
+#ifndef quantum
+#define quantum
+#include"BP_quantum_func1.h"
+#endif
+
+
 
 using namespace std;
 #include <itpp/itbase.h>

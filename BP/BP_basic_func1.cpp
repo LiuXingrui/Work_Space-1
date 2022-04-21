@@ -5,7 +5,7 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
-#include"BP_basic_fun1.h"
+#include"BP_basic_func1.h"
 
 using namespace std;
 #include <itpp/itbase.h>

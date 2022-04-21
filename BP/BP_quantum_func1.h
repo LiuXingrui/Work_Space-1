@@ -6,7 +6,11 @@
 #include <math.h> 
 #include <random>
 #include <sstream>
-#include "BP_basic_func1.h"
+
+#ifndef basic
+#define basic
+#include"BP_basic_func1.h"
+#endif
 
 using namespace std;
 #include <itpp/itbase.h>
