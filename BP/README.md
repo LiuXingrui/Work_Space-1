@@ -33,3 +33,5 @@ BP_analysis.cpp will output all the messages after each iteration.
   `./gen_cyc <file for storing> <n> <h_k> <h_k-1> ...<h_0>`
 
 
+ HP.cpp will write the transposed H to a file:
+ `./tran <H> <H^T>`
