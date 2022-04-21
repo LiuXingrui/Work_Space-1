@@ -157,7 +157,7 @@ int main(int argc, char **argv){
 
    
 
-   cout<<"for p around "<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a ["<<n<<", "<<k<<"] code"<<endl;
+   cout<<"for p around "<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
    cout<<"average iterations:"<<endl;
    cout<<num_iter/num_of_suc_dec/2<<endl;
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;

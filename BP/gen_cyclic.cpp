@@ -56,19 +56,20 @@ int main(int argc, char **argv){
   if(h_poly.size()>n){cout<<"error! check polynomial is longer than n!"<<endl;return 1;}
 
   int k=h_poly.size()-1;
-  bmat H(n-k,n);
+  bmat H(n-k+1,n);
   H.zeros();
 
-  for (int i=0;i<n-k;i++)
+  for (int i=0;i<=n-k;i++)
     {
       int i2=0;
       for (int j=n-1-i;j>n-2-k-i;j--)
 	{
-	  H(i,j)=h_poly(i2);
+	  H(i,(j+n)%n)=h_poly(i2);
 	  i2++;
 	}
     }
-      
+
+
   write_matrix(file_name, H);
 
 
