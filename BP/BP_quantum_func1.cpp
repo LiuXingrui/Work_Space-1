@@ -119,27 +119,28 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	{
 	  //  cout<<l<<endl;
 	  quan_s_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
-	  
+	 
 	  if (H*output_e==syndrome)
 	    {
-	      num_iter=num_iter+l;
+	      // num_iter=num_iter+l;
 	     
 	      if(quan_check(output_e,real_e,H2,c,rank2))
 		{
+		  num_iter= num_iter+l;
 		  return true;
 		  // cout<<"success! iteration number="<<l<<endl;
 		  // num_of_suc_dec++;
 		  //  cout<<num_of_suc_dec<<endl;
 		}
-	      else
-		{
-		  return false;
+	      // else
+	      //	{
+	      //	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
-		}	    	  
+	      //	}	    	  
 	    }
 	  
 	}
-      
+     // num_iter=num_iter+lmax;
        return false;
  }
 

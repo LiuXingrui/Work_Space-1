@@ -146,7 +146,7 @@ int main(int argc, char **argv){
    for (int s=0;s<num_of_cws;s++)
     {
       Hx_suc= quan_decode(Hx,Hz, xchecks,zerrors,pxv,num_iter,lmax,rankz);
-     
+      // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
 	  num_of_x_suc_dec++;
@@ -160,7 +160,7 @@ int main(int argc, char **argv){
 
    cout<<"for p around "<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
    cout<<"average iterations:"<<endl;
-   cout<<num_iter/num_of_suc_dec/num_of_x_suc_dec<<endl;
+   cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
 
   return 0;

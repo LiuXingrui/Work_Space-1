@@ -279,7 +279,7 @@ int  cla_decode(int v,int c,const bmat &H,const nodes checks[],const nodes error
 	  if(l==lmax)
 	    {
 	    er=er+ distance(output_e, real_e, n);
-	    num_iter=num_iter+l;
+	    //num_iter=num_iter+l;
 	    return 0;	   	 
 	    }
 	}
