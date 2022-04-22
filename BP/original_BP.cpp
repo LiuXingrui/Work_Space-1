@@ -5,7 +5,17 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
+
+#ifndef basic
+#define basic
 #include"BP_basic_func1.h"
+#endif
+
+#ifndef quantum
+#define quantum
+#include"BP_quantum_func1.h"
+#endif
+
 #include <sstream>
 
 using namespace std;
@@ -98,7 +108,6 @@ int main(int argc, char **argv){
 
   //read the parity check matrix:
   int n;
-  int k;;
   int &v=n;
   int r;
   int &c=r;
@@ -116,7 +125,7 @@ int main(int argc, char **argv){
   //find the neighbourhoods of all nodes:
   initialize_checks (H, checks,  E);
   initialize_errors(H, errors);
-
+  int k=n-bmat_rank(H);
   int er=0;  //er is the number of bits that are wrong after decoding
   
   for (int s=0;s<num_of_cws;s++)
@@ -124,7 +133,7 @@ int main(int argc, char **argv){
       num_of_suc_dec= num_of_suc_dec+cla_decode( v,c,H, checks, errors,bsc, num_iter,  lmax, er,p);
     }
   
-  cout<<"for p="<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a ["<<v<<", "<<v-c<<"] code"<<endl;
+  cout<<"for p="<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a ["<<v<<", "<<k<<"] code"<<endl;
   // cout<<"and there are "<< n_valid_cws<<" decoding results are codewords"<<endl;
   cout<<"bit error rate after decoding is ";
   cout<<er/(1.0*n*num_of_cws)<<endl;

@@ -132,11 +132,11 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 		  // num_of_suc_dec++;
 		  //  cout<<num_of_suc_dec<<endl;
 		}
-	      // else
-	      //	{
-	      //	  return false;
+	       else
+	      	{
+	      	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
-	      //	}	    	  
+	      	}	    	  
 	    }
 	  
 	}
