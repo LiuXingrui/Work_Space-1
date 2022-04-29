@@ -17,6 +17,9 @@ cla_BP:BP_basic_func1.cpp original_BP.cpp BP_quantum_func1.cpp
 quan_BP:quantum_BP.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 		g++   `pkg-config --cflags itpp` -o qBP quantum_BP.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
 
+xquan_BP:quantum_BP_x_only.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		g++   `pkg-config --cflags itpp` -o xqBP quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
 gen_cyc: gen_cyclic.cpp  BP_basic_func1.cpp
 	g++   `pkg-config --cflags itpp` -o gen_cyc gen_cyclic.cpp  BP_basic_func1.cpp  `pkg-config --libs itpp`
 
