@@ -16,11 +16,6 @@ Which is the matrix:
 The first line is n n-k, then is the sparse matrix form. The first element is labeled 1 rather than 0.
 M2, M3... are some matrices from MayKay's website.
   
-  
-BP_analysis.cpp will output all the messages after each iteration.  
-  bptest is the executable program.  
-  `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
-  
   gen_HPC.cpp will generate Hx and Hz for hypergraph product code.    
   `./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>`
   
@@ -39,3 +34,9 @@ BP_analysis.cpp will output all the messages after each iteration.
  `./display <H>` prints a dense mat.  
 
  Check script_toric.py and Makefile for more commands.
+ 
+ pyplot is for ploting.  
+ 
+ BP_analysis.cpp will output all the messages after each iteration.  
+  bptest is the executable program.  
+  `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
