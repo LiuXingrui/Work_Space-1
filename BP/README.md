@@ -35,5 +35,7 @@ BP_analysis.cpp will output all the messages after each iteration.
 
  HT.cpp will write the transposed H to a file:  
  `./tran <H> <H^T>`
+ 
+ `./display <H>` print a dense mat.  
 
  Check script_toric.py and Makefile for more commands.
