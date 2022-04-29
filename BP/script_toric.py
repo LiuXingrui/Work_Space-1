@@ -3,7 +3,7 @@ import os
 a=range(3,13)
 for n in a:
    # subprocess.run(["./gen_cyc2", "testn%d_cyc11"%n,"%d"%n,"1 1"]) #subprocess will give a wrong file, don't know why
-    command1="./gen_cyc2 n%d_cyc11 %d 1 1"%(n, n)
+    command1="./gen_cyc n%d_cyc11 %d 1 1"%(n, n)
     os.system(command1)
     #print(command1)
     command2="./tran n%d_cyc11 n%d_cyc11T"%(n,n)

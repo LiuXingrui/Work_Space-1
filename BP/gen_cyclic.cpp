@@ -62,9 +62,9 @@ int main(int argc, char **argv){
   for (int i=0;i<=n-k;i++)
     {
       int i2=0;
-      for (int j=n-1-i;j>n-2-k-i;j--)
+      for (int j=i;j<i+k+1;j++)
 	{
-	  H(i,(j+n)%n)=h_poly(i2);
+	  H(i,j%n)=h_poly(i2);
 	  i2++;
 	}
     }
