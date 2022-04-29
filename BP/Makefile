@@ -25,3 +25,6 @@ gen_cyc: gen_cyclic.cpp  BP_basic_func1.cpp
 
 tran: HT.cpp  BP_basic_func1.cpp
 	g++   `pkg-config --cflags itpp` -o tran HT.cpp  BP_basic_func1.cpp  `pkg-config --libs itpp`
+
+display: BP_quantum_func1.cpp display_mat.cpp BP_basic_func1.cpp
+	g++   `pkg-config --cflags itpp` -o display  BP_quantum_func1.cpp display_mat.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`

@@ -17,8 +17,8 @@ using namespace itpp;
 //Hz=H2^T prod I, I prod H1^T
 int main (int argc, char **argv){
 
-  if (argc!=5){
-    cout<<"need exactly 4 parameters, which are names for files stored H1, H2, Hx,Hz"<<endl;
+  if (argc!=5&&argc!=6){
+    cout<<"need 4 or 5 parameters, which are names for files stored H1, H2, Hx,Hz"<<endl;
     return 1;
   }
 
@@ -34,7 +34,7 @@ int main (int argc, char **argv){
   
   bmat H1T=transpose(H1);
   bmat H2T=transpose(H2);
-
+  
   // int thr_n=r1*n2+r2*n1;
   // int s1,s2;
   // s1=n1-r1;
@@ -62,9 +62,16 @@ int main (int argc, char **argv){
   //    cout<<Hx*transpose(Hz)<<endl;
   //  }
 
+  
   write_matrix(Hx_file, Hx);
   write_matrix(Hz_file,Hz);
+  if (argc==6)
+    {
+      cout<<"H1= \n"<<H1<<"\n H1T=\n"<<H1T<<"\n H2=\n"<<H2<<"\nH2T=\n"<<H2T<<endl;
+      cout<<"Hx=\n"<<Hx<<endl;
+      cout<<"Hz=\n"<<Hz<<endl;
 
+	}
 
   return 0;
 
