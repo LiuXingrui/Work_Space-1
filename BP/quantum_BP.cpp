@@ -23,9 +23,9 @@ using namespace std;
 #include <itpp/itcomm.h>
 using namespace itpp;
 
-
-
+//GlobalRNG_reset (1);
 int main(int argc, char **argv){
+  GlobalRNG_randomize ();
   double p;
   int num_of_cws;
   string file_name;
@@ -65,9 +65,9 @@ int main(int argc, char **argv){
 		      cout<<"lmax should be an int"<<endl;
 		      return 1;
 		    }
-		if (argc>=7)
+		if (argc>7)
 		  {
-		    cout<<"more than 5 paremeters, example: my_prog Hx_file Hz_file p num_of_cws lmax"<<endl;
+		    cout<<"more than 6 paremeters, example: my_prog Hx_file Hz_file p num_of_cws lmax"<<endl;
 		    return 1;
 		  }
 	
@@ -100,7 +100,7 @@ int main(int argc, char **argv){
        num_of_cws=1000;
        lmax=20;
     }
-  GlobalRNG_randomize ();
+ 
 
   
   double num_iter=0.0; //for calculate average iterations for e_x
@@ -113,8 +113,7 @@ int main(int argc, char **argv){
 
   //read the parity check matrix:
   int n1,n2,n,k,r1,r2,r;
-  int&rx=r1;
-  int&rz=r2;
+ 
 
   bmat Hx=read_matrix ( n1,r1, file_name);
   bmat Hz=read_matrix ( n2,r2, file_name2);
@@ -144,7 +143,7 @@ int main(int argc, char **argv){
   initialize_checks (Hx, xchecks,  E1);
   initialize_errors(Hx, zerrors);
 
-  initialize_checks (Hz, zchecks,  E1);
+  initialize_checks (Hz, zchecks,  E2);
   initialize_errors(Hz, xerrors);
 
   vec pxv(n);
@@ -152,7 +151,7 @@ int main(int argc, char **argv){
   pro_dist( p, pxv);
   pro_dist( p, pzv);
 
-  int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
+  // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
       Hx_suc= quan_decode(Hx,Hz, xchecks,zerrors,pxv,num_iter,lmax,rankz);
@@ -172,7 +171,16 @@ int main(int argc, char **argv){
    cout<<"average iterations:"<<endl;
    cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
+   if (argc==7)
+     {
 
+       string data_file=argv[6];
+       ofstream myfile;
+       myfile.open (data_file,ios::app);
+       myfile << n<<"  "<< num_of_suc_dec<<"  "<<p<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
+       myfile.close();
+
+     }
   return 0;
 
 }

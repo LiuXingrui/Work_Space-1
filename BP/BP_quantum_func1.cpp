@@ -28,9 +28,8 @@ using namespace itpp;
   ivec    P; 
 
 void error_channel(bvec &cw, const vec &p){
-  
-  int temp=1e8;
-  int temp2;
+ 
+  double temp2;
   bin one=1;
   if (cw.size()!=p.size())
     {cout<<"the size of p and cw do not match"<<endl;}
@@ -39,8 +38,8 @@ void error_channel(bvec &cw, const vec &p){
     {
     for (int i=0;i<cw.size();i++)
       {    
-	temp2=randi(1,temp);
-	if(temp2<p[i]*temp)
+	temp2=randu();
+	if(temp2<p[i])
 	  {
 	    cw[i]=cw[i]+one;
 	  }	
@@ -53,14 +52,14 @@ void error_channel(bvec &cw, const vec &p){
 void pro_dist(double p, vec& pv){
 
   double minp=0.5*p;
-  double maxp=1.5*p;
+  // double maxp=1.5*p;
   int pvsize=pv.size();
   double temp;
   int temp2=1e8;
 
   for (int i=0;i<pvsize;i++)
     {
-      temp=p*randi(1,temp2)/temp2;
+      temp=p*randu();
       pv(i)=minp+temp;
     }
 }
@@ -68,7 +67,7 @@ void pro_dist(double p, vec& pv){
 bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int rank2){
   int v=H.cols();
   int c=H.rows();
-  int r2=H2.rows();
+  // int r2=H2.rows();
   bvec real_eT(v);    //the transposed error vector, which is a row vector.
   real_eT.zeros();
   error_channel(real_eT, pv);
