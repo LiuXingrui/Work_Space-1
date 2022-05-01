@@ -71,7 +71,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
   bvec real_eT(v);    //the transposed error vector, which is a row vector.
   real_eT.zeros();
   error_channel(real_eT, pv);
-   
+  // cout<<pv<<endl;
 
   //if no error, break
   bvec zero_vec(v);
@@ -104,7 +104,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	    {
 	      return false;
 	      //er=er+ distance(zero_mat2, real_e, n);  
-	      // cout<<"failure! error= some codeword"<<endl;
+	      // cout<<"failure! real_error is in NS"<<endl;
 	    }  
 	}
   
@@ -112,11 +112,12 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
       mat mvc(c,v);   // the messages from variable nodes to check nodes
       initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
       bmat output_e(v,1);
-      output_e.zeros();
+      
       
       for (int l=1;l<=lmax;l++)
 	{
 	  //  cout<<l<<endl;
+	  output_e.zeros();
 	  quan_s_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
 	 
 	  if (H*output_e==syndrome)
@@ -133,6 +134,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 		}
 	       else
 	      	{
+		  //cout<<"failure, e-e' is in NS"<<endl;
 	      	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
 	      	}	    	  
@@ -140,6 +142,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	  
 	}
      // num_iter=num_iter+lmax;
+     // cout<<"failure, reach maximum iterations"<<endl;
        return false;
  }
 
@@ -180,10 +183,11 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 
   //check if real_e is a stabilizer
   bool Q_inspan(bvec &real_eT,bmat &H2,int ori_rank){
+    bmat H2copy=H2;
     int r=H2.rows();
-    H2.ins_row (r, real_eT);    
-    int i=bmat_rank(H2);
-     H2.del_row ( r);
+    H2copy.ins_row (r, real_eT);    
+    int i=bmat_rank(H2copy);
+    //  H2.del_row ( r);
   
     if (i==ori_rank){return true;}
     else if (i==ori_rank+1){return false;}

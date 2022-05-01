@@ -65,9 +65,9 @@ int main(int argc, char **argv){
 		      cout<<"lmax should be an int"<<endl;
 		      return 1;
 		    }
-		if (argc>7)
+		if (argc>8)
 		  {
-		    cout<<"more than 6 paremeters, example: my_prog Hx_file Hz_file p num_of_cws lmax"<<endl;
+		    cout<<"more than 7 paremeters, example: my_prog Hx_file Hz_file p num_of_cws lmax outputdata error-channel"<<endl;
 		    return 1;
 		  }
 	
@@ -148,8 +148,20 @@ int main(int argc, char **argv){
 
   vec pxv(n);
   vec pzv(n);
-  pro_dist( p, pxv);
-  pro_dist( p, pzv);
+  if (argc==8)    
+    {
+      pro_dist( p, pxv);
+      pro_dist( p, pzv);
+    }
+
+  else
+    {
+      for (int i=0;i<n;i++)
+	{
+	  pxv(i)=p;
+	  pzv(i)=p;
+	}
+    }
 
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
@@ -171,7 +183,7 @@ int main(int argc, char **argv){
    cout<<"average iterations:"<<endl;
    cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
-   if (argc==7)
+   if (argc>=7)
      {
 
        string data_file=argv[6];
