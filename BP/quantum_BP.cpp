@@ -133,6 +133,7 @@ int main(int argc, char **argv){
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
+       
 	  num_of_x_suc_dec++;
 	  Hz_suc= quan_decode(Hz,Hx, zchecks,xerrors,pzv,num_iter,lmax,rankx);
 	 
@@ -144,7 +145,11 @@ int main(int argc, char **argv){
 
    cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
    cout<<"average iterations:"<<endl;
+   if((num_of_x_suc_dec+num_of_suc_dec)!=0)
+     {
    cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
+     }
+   else{cout<<0<<endl;}
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
  
    double midp=(pmax+pmin)/2;

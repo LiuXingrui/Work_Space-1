@@ -30,10 +30,10 @@ void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,c
 bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int rank2);
 
   //check if real_e is a stabilizer
-bool Q_inspan(bvec &real_eT,bmat &H2,int ori_rank);
+bool Q_inspan(const bvec &real_eT,const bmat &H2,int ori_rank);
 
 //check if real_e-output_e is a stabilizer
-bool quan_check(bmat &output_e,bmat &real_e,bmat &H2,int n,int rank2);
+bool quan_check(const bmat &output_e,const bmat &real_e,const bmat &H2,int n,int rank2);
 
 //rank of a bmat
-int bmat_rank(bmat& H);
+int bmat_rank(const bmat& H);

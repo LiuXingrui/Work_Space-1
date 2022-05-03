@@ -99,9 +99,14 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
   if (syndrome==zero_mat1)
 	{
 	  // is e a stablizer?
-	  if (Q_inspan(real_eT,H2,rank2)){return true;}        
+	  if (Q_inspan(real_eT,H2,rank2))
+	    {
+	      
+	      return true;
+	    }        
 	  else  
 	    {
+	    
 	      return false;
 	      //er=er+ distance(zero_mat2, real_e, n);  
 	      // cout<<"failure! real_error is in NS"<<endl;
@@ -126,6 +131,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	     
 	      if(quan_check(output_e,real_e,H2,c,rank2))
 		{
+		  // cout<<"suc! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
 		  num_iter= num_iter+l;
 		  return true;
 		  // cout<<"success! iteration number="<<l<<endl;
@@ -134,6 +140,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 		}
 	       else
 	      	{
+		  // cout<<"failure! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
 		  //cout<<"failure, e-e' is in NS"<<endl;
 	      	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
@@ -143,6 +150,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 	}
      // num_iter=num_iter+lmax;
      // cout<<"failure, reach maximum iterations"<<endl;
+      // cout<<"failure and reach maximum iterations,  Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
        return false;
  }
 
@@ -182,7 +190,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 }
 
   //check if real_e is a stabilizer
-  bool Q_inspan(bvec &real_eT,bmat &H2,int ori_rank){
+  bool Q_inspan(const bvec &real_eT,const bmat &H2, int ori_rank){
     bmat H2copy=H2;
     int r=H2.rows();
     H2copy.ins_row (r, real_eT);    
@@ -197,23 +205,26 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
 }
 
 //check if real_e-output_e is a stabilizer
-  bool quan_check(bmat &output_e,bmat &real_e,bmat &H2,int n,int rank2){
+  bool quan_check(const bmat &output_e,const bmat &real_e,const bmat &H2, int n, int rank2){
     
    bvec difference(n);
+   bvec z(n);
+   z.zeros();
+ 
    for (int i=0;i<n;i++)
      {
-       difference(i)=output_e(i,0)+real_e(i,0);       
-     }
+       difference(i)=output_e(i,0)+real_e(i,0);
     
-   return Q_inspan(difference,H2,rank2);
+     }
+ 
+    return Q_inspan(difference,H2,rank2);
  }
 
 
 
 //get the rank of H and gaussian eliminate H:
-int bmat_rank(bmat& H){
+int bmat_rank(const bmat& H){
 
   GF2mat Hp(H);
-
   return Hp.T_fact(T,U,P);	
 }
