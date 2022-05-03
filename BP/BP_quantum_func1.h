@@ -21,7 +21,7 @@ using namespace itpp;
 void error_channel(bvec &cw, const vec &p);
 
 //get a error probability vector whose components are random from 0.5p t0 1.5p
-void pro_dist(double p, vec& pv);
+void pro_dist(double pmin,double pmax, vec& pv);
 
 //a quantum sequential update schedule: 
 void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,const vec &pv,int c, int v,  bmat& output_e);

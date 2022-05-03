@@ -49,18 +49,18 @@ void error_channel(bvec &cw, const vec &p){
 }
 
 
-void pro_dist(double p, vec& pv){
+void pro_dist(double pmin,double pmax, vec& pv){
 
-  double minp=0.5*p;
-  // double maxp=1.5*p;
+ 
+  double pdiff=pmax-pmin;
   int pvsize=pv.size();
   double temp;
-  int temp2=1e8;
+ 
 
   for (int i=0;i<pvsize;i++)
     {
-      temp=p*randu();
-      pv(i)=minp+temp;
+      temp=pdiff*randu();
+      pv(i)=pmin+temp;
     }
 }
 

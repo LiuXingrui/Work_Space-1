@@ -26,83 +26,54 @@ using namespace itpp;
 //GlobalRNG_reset (1);
 int main(int argc, char **argv){
   GlobalRNG_randomize ();
-  double p;
+  double pmax;
+  double pmin;
   int num_of_cws;
   string file_name;
   string file_name2;
+  string data_file;
   int lmax;
   
- 
+  if (argc!=8){cout<<" need 7 parameters: ./qBP  Hx_file Hz_file pmin pmax  num_of_cws lmax data_file"<<endl;return 1;}
   //get the parameters: 
-  if (argc >= 3)
-    {
-        file_name=argv[1];
-	file_name2=argv[2];
-	if (argc>=4)
-	  {
-        istringstream argv3( argv[3] );	
-	if ( argv3 >> p){}
-	else
-	  {
-	    cout<<"p should be a double"<<endl;
-	    return 1;
-	  }
-	if (argc>=5)
-	  {
-	    istringstream argv4( argv[4] );
-	    if ( argv4 >> num_of_cws){}
-	    else
-	      {
-		cout<<"num_of_cws should be an int"<<endl;
-		return 1;
-	      }
-	    if (argc>=6)
-	      {
-		istringstream argv5( argv[5] );
-		  if ( argv5 >> lmax){}
-		  else
-		    {
-		      cout<<"lmax should be an int"<<endl;
-		      return 1;
-		    }
-		if (argc>8)
-		  {
-		    cout<<"more than 7 paremeters, example: my_prog Hx_file Hz_file p num_of_cws lmax outputdata error-channel"<<endl;
-		    return 1;
-		  }
-	
-	      }
-	    //default parameters:
-	    else
-	      {
-		lmax=20;
-	      }
-	  }
-	else
-	  {
-	    num_of_cws=1000;
-	    lmax=20;
-	  }
-
-	  }
-	else
-	  {	 
-	    p=0.01;
-	    num_of_cws=1000;
-	    lmax=20;
-	  }
-    }
+   
+  file_name=argv[1];
+  file_name2=argv[2];
+  data_file=argv[7];
+ 
+  istringstream argv3( argv[3] );	
+  if ( argv3 >> pmin){}
   else
     {
-       file_name="testHx1";
-       file_name2="testHz1";
-       p=0.01;
-       num_of_cws=1000;
-       lmax=20;
+      cout<<"pmin should be a double"<<endl;
+      return 1;
     }
- 
 
-  
+  istringstream argv4( argv[4] );
+  if ( argv4 >> pmax){}
+  else
+    {
+      cout<<"pmax should be a double"<<endl;
+      return 1;
+    }
+	   
+	     
+  istringstream argv5( argv[5] );
+  if ( argv5 >> num_of_cws){}
+  else
+    {
+      cout<<"num_of_cws should be an int"<<endl;
+      return 1;
+    }
+	        
+  istringstream argv6( argv[6] );
+  if ( argv6 >> lmax){}
+  else
+    {
+      cout<<"lmax should be an int"<<endl;
+      return 1;
+    }
+		   		         	  
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
@@ -148,21 +119,13 @@ int main(int argc, char **argv){
 
   vec pxv(n);
   vec pzv(n);
-  if (argc==8)    
-    {
-      pro_dist( p, pxv);
-      pro_dist( p, pzv);
-    }
+     
+    
+  pro_dist( pmin,pmax, pxv);
+  pro_dist( pmin,pmax, pzv);
+    
 
-  else
-    {
-      for (int i=0;i<n;i++)
-	{
-	  pxv(i)=p;
-	  pzv(i)=p;
-	}
-    }
-
+  
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
@@ -179,20 +142,19 @@ int main(int argc, char **argv){
 
    
 
-   cout<<"for p around "<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
+   cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
    cout<<"average iterations:"<<endl;
    cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
-   if (argc>=7)
-     {
+ 
+   double midp=(pmax+pmin)/2;
+      
+   ofstream myfile;
+   myfile.open (data_file,ios::app);
+   myfile << n<<"  "<< num_of_suc_dec<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
+   myfile.close();
 
-       string data_file=argv[6];
-       ofstream myfile;
-       myfile.open (data_file,ios::app);
-       myfile << n<<"  "<< num_of_suc_dec<<"  "<<p<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
-       myfile.close();
-
-     }
+     
   return 0;
 
 }
