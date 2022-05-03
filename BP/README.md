@@ -21,10 +21,9 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between 0.5p and 1.5p:  
-  `./qBP <Hx_file> <Hz_file> <p> <number of codewords><lmax> <data_file> <error_chanel>`  
+  `./qBP <Hx_file> <Hz_file>  <pmin> <pmax> <number of codewords><lmax> <data_file>`  
   
-  It is better to input all the parameters except the last one. If there are 8 parameters (include the prog_name), then the probabilities are different for different qubits. 7 parameters for same probability.
- 
+
 
   gen_cyclic.cpp will create a rank=r-1 parity check matrix file for a cyclic code, r is the number of rows:  
   `./gen_cyc <file for storing> <n> <h_k> <h_k-1> ...<h_0>`
