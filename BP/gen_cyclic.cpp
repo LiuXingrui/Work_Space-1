@@ -70,7 +70,7 @@ int main(int argc, char **argv){
     }
 
 
-  write_matrix(file_name, H);
+  write_matrix2(file_name, H);
 
 
   return 0;

@@ -29,8 +29,8 @@ int main (int argc, char **argv){
   string Hz_file=argv[4];  
   int n1,n2,r1,r2,k1,k2,n,k;
   
-  bmat H1=read_matrix(n1,r1,H1_file);
-  bmat H2=read_matrix(n2,r2,H2_file);
+  bmat H1=read_matrix2(n1,r1,H1_file);
+  bmat H2=read_matrix2(n2,r2,H2_file);
   
   bmat H1T=transpose(H1);
   bmat H2T=transpose(H2);
@@ -52,8 +52,8 @@ int main (int argc, char **argv){
   bmat Hz_left=kron(H2T,I_n1);
   bmat Hz_right=kron(I_n2,H1T);
 
-  bmat Hx=merge_mat_hori(Hx_left,Hx_right);
-  bmat Hz=merge_mat_hori(Hz_left,Hz_right);
+  bmat Hx=merge_mat_hori2(Hx_left,Hx_right);
+  bmat Hz=merge_mat_hori2(Hz_left,Hz_right);
 
   // n=Hx.rows();
   //if (n!=thr_n){cout<<"n!=thr_n, something is wrong"<<endl;}
@@ -63,8 +63,8 @@ int main (int argc, char **argv){
   //  }
 
   
-  write_matrix(Hx_file, Hx);
-  write_matrix(Hz_file,Hz);
+  write_matrix2(Hx_file, Hx);
+  write_matrix2(Hz_file,Hz);
   if (argc==6)
     {
       cout<<"H1= \n"<<H1<<"\n H1T=\n"<<H1T<<"\n H2=\n"<<H2<<"\nH2T=\n"<<H2T<<endl;

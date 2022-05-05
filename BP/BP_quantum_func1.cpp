@@ -23,25 +23,22 @@ using namespace std;
 #include <itpp/itbase.h>
 #include <itpp/itcomm.h>
 using namespace itpp;
-  GF2mat  T;
-  GF2mat  U;
-  ivec    P; 
 
-void error_channel(bvec &cw, const vec &p){
+void error_channel(GF2mat &cw, const vec &p){
  
   double temp2;
   bin one=1;
-  if (cw.size()!=p.size())
+  if (cw.cols()!=p.size())
     {cout<<"the size of p and cw do not match"<<endl;}
 
   else
     {
-    for (int i=0;i<cw.size();i++)
+    for (int i=0;i<cw.cols();i++)
       {    
 	temp2=randu();
 	if(temp2<p[i])
 	  {
-	    cw[i]=cw[i]+one;
+	    cw.set(0,i,cw(0,i)+one);
 	  }	
       }
   }
@@ -64,42 +61,42 @@ void pro_dist(double pmin,double pmax, vec& pv){
     }
 }
 
-bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int rank2){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax){
   int v=H.cols();
   int c=H.rows();
   // int r2=H2.rows();
-  bvec real_eT(v);    //the transposed error vector, which is a row vector.
-  real_eT.zeros();
+  GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
+  
   error_channel(real_eT, pv);
   // cout<<pv<<endl;
 
   //if no error, break
-  bvec zero_vec(v);
-  zero_vec.zeros();
-  if (real_eT==zero_vec)
+  GF2mat zero_rvec(1,v);
+ 
+  if (real_eT==zero_rvec)
     {
 	 
       return true;
     }
  
-  bmat zero_mat1(c,1);
-  bmat zero_mat2(v,1);
-  zero_mat1.zeros();
-  zero_mat2.zeros();
-  bmat real_e(v,1);  //the error vector which is a column vector,
-     
+  GF2mat zero_mat1(c,1);
+  GF2mat zero_mat2(v,1);
+  GF2mat zero_rvec2(v-c,1);
+  GF2mat real_e(v,1);  //the error vector which is a column vector,
+
+  
   for (int q=0;q<v;q++)
     {
-      real_e(q,0)=real_eT(q);
+      real_e.set(q,0,real_eT(0,q));
     }
   
-  bmat syndrome=H*real_e;
+  GF2mat syndrome=H*real_e;
 
   //is the syndrome a zero vector?
   if (syndrome==zero_mat1)
 	{
 	  // is e a stablizer?
-	  if (Q_inspan(real_eT,H2,rank2))
+	  if (G*real_e==zero_rvec2)
 	    {
 	      
 	      return true;
@@ -115,21 +112,22 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
   
       mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
       mat mvc(c,v);   // the messages from variable nodes to check nodes
+      mcv.zeros();
+      mvc.zeros();
       initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
-      bmat output_e(v,1);
-      
+      GF2mat output_e(v,1);
+     ;
       
       for (int l=1;l<=lmax;l++)
 	{
 	  //  cout<<l<<endl;
-	  output_e.zeros();
 	  quan_s_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
 	 
 	  if (H*output_e==syndrome)
 	    {
 	      // num_iter=num_iter+l;
 	     
-	      if(quan_check(output_e,real_e,H2,c,rank2))
+	      if(G*(output_e+real_e)==zero_rvec2)
 		{
 		  // cout<<"suc! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
 		  num_iter= num_iter+l;
@@ -155,7 +153,7 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
  }
 
 
-  void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,const vec &pv,int c, int v,  bmat& output_e){
+  void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e){
   
     double ipr;
 
@@ -185,46 +183,42 @@ bool  quan_decode(bmat &H, bmat &H2,const nodes checks[],const nodes errors[],co
        final_pr=final_pr*mcv(cnode,j);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
-       output_e(j,0)=final_pr<1? 1:0;      
+
+       output_e.set(j,0,final_pr<1? 1:0);   
     }  
 }
 
-  //check if real_e is a stabilizer
-  bool Q_inspan(const bvec &real_eT,const bmat &H2, int ori_rank){
-    bmat H2copy=H2;
-    int r=H2.rows();
-    H2copy.ins_row (r, real_eT);    
-    int i=bmat_rank(H2copy);
-    //  H2.del_row ( r);
-  
-    if (i==ori_rank){return true;}
-    else if (i==ori_rank+1){return false;}
-    else {cout<<"some wrong happened with the Q_inspan func"<<endl;return false;}
-  
-
-}
-
-//check if real_e-output_e is a stabilizer
-  bool quan_check(const bmat &output_e,const bmat &real_e,const bmat &H2, int n, int rank2){
-    
-   bvec difference(n);
-   bvec z(n);
-   z.zeros();
- 
-   for (int i=0;i<n;i++)
-     {
-       difference(i)=output_e(i,0)+real_e(i,0);
-    
-     }
- 
-    return Q_inspan(difference,H2,rank2);
- }
-
-
 
 //get the rank of H and gaussian eliminate H:
-int bmat_rank(const bmat& H){
+int GF2mat_rank(const GF2mat& H){
 
-  GF2mat Hp(H);
-  return Hp.T_fact(T,U,P);	
+  GF2mat T,U;
+  ivec P;
+  return H.T_fact(T,U,P);	
+}
+
+
+GF2mat get_gen(const GF2mat &H){
+  GF2mat HT=H.transpose();
+  GF2mat T,U;
+  ivec P;
+  int Hrank= HT.T_fact(T,U,P);
+  int r=H.rows();
+  int n=H.cols();
+  int k=n-r;
+
+  GF2mat C=U.get_submatrix(0,0,r-1,n-r-1);
+  // cout<<C.cols()<<"  "<<C.rows()<<endl;
+ 
+  // GF2mat C=CT.transpose();
+  bmat Ik;
+  Ik=eye_b(k);
+  // cout<<Ik.cols()<<endl;
+  GF2mat I(Ik);
+  //cout<<I.cols()<<endl;
+  GF2mat G= merge_mat_hori(I,C);
+  return G;
+
+
+
 }

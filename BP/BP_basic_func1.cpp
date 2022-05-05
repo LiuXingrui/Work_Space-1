@@ -14,7 +14,7 @@ using namespace itpp;
 
 
 //find the neighbors of check nodes  
-void initialize_checks (const bmat &H, nodes checks[], int & E){
+void initialize_checks (const GF2mat &H, nodes checks[], int & E){
   int r=H.rows();
   int c=H.cols();
   
@@ -35,7 +35,7 @@ void initialize_checks (const bmat &H, nodes checks[], int & E){
 
 
 //find the neighbors of variable(error) nodes
-void initialize_errors(const bmat &H, nodes errors[]){
+void initialize_errors(const GF2mat &H, nodes errors[]){
 
     int r=H.rows();
     int c=H.cols();
@@ -57,7 +57,7 @@ void initialize_errors(const bmat &H, nodes errors[]){
 }
 
 //initialize massages to all-one matrices
-void initialize_massages(mat &mcv,mat& mvc,const bmat &H){
+void initialize_massages(mat &mcv,mat& mvc,const GF2mat &H){
     int r=H.rows();
     int c=H.cols();
     for (int i=0;i<r;i++)
@@ -73,7 +73,7 @@ void initialize_massages(mat &mcv,mat& mvc,const bmat &H){
 }
 
 //in fact, it is a sequential update schedule.
-void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
+void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e){
   
     double ipr=(1-p)/p;
 
@@ -103,12 +103,12 @@ void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
        final_pr=final_pr*mcv(cnode,j);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
-       output_e(j,0)=final_pr<1? 1:0;      
+      output_e.set(j,0,final_pr<1? 1:0);        
     }  
 }
 
 //the parallel schedule
-void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
+void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e){
   
   double ipr=(1-p)/p;
   pre_mcv=mcv;
@@ -140,13 +140,13 @@ void real_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,m
        final_pr=final_pr*mcv(cnode,j);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
-       output_e(j,0)=final_pr<1? 1:0;      
+       output_e.set(j,0,final_pr<1? 1:0);       
     }
  
 }
 
 //the sequential schedule from that paper
-void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const bmat& syndrome,double p,int c, int v,  bmat& output_e){
+void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e){
   
     double ipr=(1-p)/p; //initial p0/p1
     double  final_pr;  //final p0/p1
@@ -172,7 +172,7 @@ void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
 	     final_pr=final_pr*mcv(ci,j);      
 	   } 
 	 //  cout<<j<<"   "<<final_pr<<endl;
-	 output_e(j,0)=final_pr<1? 1:0;      
+	 output_e.set(j,0,final_pr<1? 1:0);      
       }  
 }
 
@@ -211,49 +211,50 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
 }
 
 
-int  cla_decode(int v,int c,const bmat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p){
+int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p){
 
   int n=v;
   bvec real_eT(v);    //the transposed error vector, which is a row vector.
- 
+  real_eT.zeros();
   
   //if no error, break
   bvec zero_vec(v);
   zero_vec.zeros();
   real_eT=bsc(zero_vec);
+  
   if (real_eT==zero_vec)
     {
-      // cout<<"zero"<<endl;
+      // cout<<"suc, no error"<<endl;
       return 1;
     }
   
-  bmat zero_mat1(c,1);
-  bmat zero_mat2(v,1);
-  zero_mat1.zeros();
-  zero_mat2.zeros();
-  bmat real_e(v,1);  //the error vector which is a column vector,
+  GF2mat zero_mat1(c,1);
+  GF2mat zero_mat2(v,1);
+  GF2mat real_e(v,1);  //the error vector which is a column vector,
+
      
   for (int q=0;q<v;q++)
     {
-      real_e(q,0)=real_eT(q);
+      real_e.set(q,0,real_eT(q));
     }
-  bmat syndrome=H*real_e;
+  GF2mat syndrome=H*real_e;
 
   //is the syndrome a zero vector?
   if (syndrome==zero_mat1)
 	{
-	  // is e a stablizer?	    
+	  //cout<<"failure! error= some codeword"<<endl;	    
 	  er=er+ distance(zero_mat2, real_e, n);
 	  return 0;	 
-	  // cout<<"failure! error= some codeword"<<endl;	   
+		   
 	}
    
       mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
       mat mvc(c,v);   // the messages from variable nodes to check nodes
+      mcv.zeros();
+      mvc.zeros();
       initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
-      bmat output_e(v,1);
-      output_e.zeros();
-      
+      GF2mat output_e(v,1);
+   
       for (int l=1;l<=lmax;l++)
 	{
 	  //  cout<<l<<endl;
@@ -265,27 +266,30 @@ int  cla_decode(int v,int c,const bmat &H,const nodes checks[],const nodes error
 	     
 	      if(output_e==real_e)
 		{
+		  //cout<<"success! iteration number="<<l<<endl;
 		  return 1;
-		  // cout<<"success! iteration number="<<l<<endl;
+		  
 		  // num_of_suc_dec++;
 		  //  cout<<num_of_suc_dec<<endl;
 		}
 	      else
 		{
+		  cout<<"error!,get the wrong e"<<endl;
 		  er=er+ distance(output_e, real_e, n);	  
 		  return 0;		       
 		}	    	  
 	    }
 	  if(l==lmax)
 	    {
-	    er=er+ distance(output_e, real_e, n);
-	    //num_iter=num_iter+l;
-	    return 0;	   	 
+	      //cout<<"reach max iter"<<endl;
+		er=er+ distance(output_e, real_e, n);
+	      //num_iter=num_iter+l;
+	      return 0;	   	 
 	    }
 	}
  }
   //the distance between 2 cws
-int distance(const bmat &output_e, const bmat &real_e,int n){
+int distance(const GF2mat &output_e, const GF2mat &real_e,int n){
   
   int er=0;
   for (int i=0;i<n;i++)
@@ -300,7 +304,7 @@ int distance(const bmat &output_e, const bmat &real_e,int n){
       
 
 //print the positions of errors
-void print_error_pos( const bmat &real_e,int n){
+void print_error_pos( const GF2mat &real_e,int n){
   
   int er=0;
   for (int i=0;i<n;i++)
@@ -313,7 +317,48 @@ void print_error_pos( const bmat &real_e,int n){
 }
   
 //read a parity check matrix
-bmat read_matrix (int& n,int &r, string & file_name){
+GF2mat read_matrix (int& n,int &r, string & file_name){
+  ifstream parity_check(file_name);
+  string line;
+  int row_ind=0;
+  int temp;
+  getline(parity_check, line);
+  istringstream iss(line);
+  
+  if(  iss>>n>>r) {}
+  else
+    {
+      cout<<"did not open the right parity check file"<<endl;
+      
+    }
+ 
+  GF2mat H(r,n);
+  while( getline(parity_check, line))
+    {
+      istringstream iss2(line);
+      while (iss2>>temp){
+	if (temp>=1&&temp<=n&&row_ind<r)
+	  {
+	    H.set(row_ind,temp-1,1);
+	    // cout<< H(row_ind,temp-1)<<endl;
+	  }
+	else
+	  {
+	    cout<<"the format of the parity check is wrong, the first element is 1 rathar than 0"<<endl;
+	    
+	  }
+	
+      }
+		  row_ind++;
+    }
+  parity_check.close();
+  // cout<<H<<endl;
+  return H;
+
+  
+}
+
+bmat read_matrix2 (int& n,int &r, string & file_name){
   ifstream parity_check(file_name);
   string line;
   int row_ind=0;
@@ -337,6 +382,7 @@ bmat read_matrix (int& n,int &r, string & file_name){
 	if (temp>=1&&temp<=n&&row_ind<r)
 	  {
 	    H(row_ind,temp-1)=1;
+	    // cout<< H(row_ind,temp-1)<<endl;
 	  }
 	else
 	  {
@@ -348,14 +394,42 @@ bmat read_matrix (int& n,int &r, string & file_name){
 		  row_ind++;
     }
   parity_check.close();
-
+  // cout<<H<<endl;
   return H;
 
   
 }
 
 //write a matrix to a file
-void write_matrix(string file_name, bmat &H){
+void write_matrix(string file_name, GF2mat &H){
+
+  ofstream Hx;
+  Hx.open (file_name,ios::trunc);
+  int n=H.cols();
+  int r=H.rows();
+
+
+  Hx<<n<<" "<<r<<endl;
+
+  for (int j=0;j<r;j++)
+    {
+      for (int i=0; i<n;i++)
+	{
+	  if (H(j,i)!=0)
+	    {
+	      Hx<<i+1<<" ";
+	    }
+	  
+	}
+      Hx<<endl;
+    }
+  
+
+  Hx.close();
+
+}
+
+void write_matrix2(string file_name, bmat &H){
 
   ofstream Hx;
   Hx.open (file_name,ios::trunc);
@@ -384,13 +458,13 @@ void write_matrix(string file_name, bmat &H){
 }
 
 //merge 2 matrices horizontally, [H1,H2]
-bmat merge_mat_hori(const bmat &left,const bmat &right){
+bmat merge_mat_hori2(const bmat &left,const bmat &right){
 
   if (left.rows()!=right.rows())
     {
       cout<<"the 2 matrices cannot merge horizontally"<<endl;
       bmat error(1,1);
-      error.zeros();
+   
       return error;
     }
 
@@ -409,6 +483,41 @@ bmat merge_mat_hori(const bmat &left,const bmat &right){
 	  }
 	  for (int j2=0;j2<c2;j2++){
 	    m(i,c1+j2)=right(i,j2);
+	  }
+	  
+	}
+       return m;
+    }
+
+ 
+
+}
+
+GF2mat merge_mat_hori(const GF2mat &left,const GF2mat &right){
+
+  if (left.rows()!=right.rows())
+    {
+      cout<<"the 2 matrices cannot merge horizontally"<<endl;
+      GF2mat error(1,1);
+   
+      return error;
+    }
+
+  else
+    {
+      int r=left.rows();
+      int c=left.cols()+right.cols();
+      int c1=left.cols();
+      int c2=right.cols();
+      GF2mat m(r,c);
+
+      for (int i=0;i<r;i++)
+	{
+	  for (int j1=0;j1<c1;j1++){
+	    m.set(i,j1,left(i,j1));
+	  }
+	  for (int j2=0;j2<c2;j2++){
+	    m.set(i,c1+j2,right(i,j2));
 	  }
 	  
 	}

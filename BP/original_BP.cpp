@@ -95,7 +95,7 @@ int main(int argc, char **argv){
     {
        file_name="M2";
        p=0.01;
-       num_of_cws=10000;
+       num_of_cws=100;
        lmax=20;
     }
 
@@ -116,8 +116,8 @@ int main(int argc, char **argv){
   int num_zero_cws=0;
 
 
-  bmat H=read_matrix ( n,r,  file_name);
-  
+  GF2mat H=read_matrix ( n,r,  file_name);
+  //cout<<H<<endl;
   nodes  checks[c];
   nodes  errors[v];
   BSC bsc(p);
@@ -125,7 +125,7 @@ int main(int argc, char **argv){
   //find the neighbourhoods of all nodes:
   initialize_checks (H, checks,  E);
   initialize_errors(H, errors);
-  int k=n-bmat_rank(H);
+  int k=n-GF2mat_rank(H);
   int er=0;  //er is the number of bits that are wrong after decoding
   
   for (int s=0;s<num_of_cws;s++)

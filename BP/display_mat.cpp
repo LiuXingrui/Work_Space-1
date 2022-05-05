@@ -29,8 +29,8 @@ int main(int argc, char **argv){
 
   string file_name=argv[1];
   int n,r;
-  bmat H=read_matrix ( n,r, file_name);
-  cout<<n<<"  "<<n-bmat_rank(H)<<endl;
+  GF2mat H=read_matrix ( n,r, file_name);
+  cout<<n<<"  "<<n-GF2mat_rank(H)<<endl;
   cout<<H<<endl;
   return 0;
 }

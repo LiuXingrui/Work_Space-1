@@ -84,24 +84,37 @@ int main(int argc, char **argv){
 
   //read the parity check matrix:
   int n1,n2,n,k,r1,r2,r;
- 
-
-  bmat Hx=read_matrix ( n1,r1, file_name);
-  bmat Hz=read_matrix ( n2,r2, file_name2);
   
+ 
+  // bmat Hx2=read_matrix2( n1,r1, file_name);
+  // bmat Hz2=read_matrix2( n2,r2, file_name2);
+  //bmat zero_mat12(r1,r2);
+  //cout<<Hx2*transpose(Hz2)<<endl;
+
+  
+  GF2mat Hx=read_matrix( n1,r1, file_name);
+  GF2mat Hz=read_matrix( n2,r2, file_name2);
+ 
   //are the parity check matrices right?
   if (n1!=n2){cout<<"nx!=nz, the two matrices donot match"<<endl;return 1;}  
   n=n1;
   r=r1+r2;
-  int rankx=bmat_rank(Hx);
-  int rankz=bmat_rank(Hz);
+  int rankx=GF2mat_rank(Hx);
+  int rankz=GF2mat_rank(Hz);
   k=n-rankx-rankz;
-  bmat zero_mat1(r1,r2);
-  zero_mat1.zeros();
+  GF2mat zero_mat1(r1,r2);
+
+ 
   
 
-  if((Hx*transpose(Hz))!=zero_mat1) {cout<<"Hx*Hz^T!=0, the two matrices donot match"<<endl;return 1;}
-
+  if((Hx*Hz.transpose())==zero_mat1) {}
+  else{cout<<"Hx*Hz^T!=0, the two matrices donot match"<<endl;return 1;}
+  //cout<<Hx*Hz.transpose()<<endl;
+  
+  GF2mat Gx=get_gen(Hx);
+  //cout<<Gx*Hx.transpose()<<endl;
+  GF2mat Gz=get_gen(Hz);
+  // cout<<Gz*Hx.transpose()<<endl;
   
   nodes  xchecks[r1];//checks for Hx and Z errors
   nodes  zerrors[n];
@@ -124,18 +137,18 @@ int main(int argc, char **argv){
   pro_dist( pmin,pmax, pxv);
   pro_dist( pmin,pmax, pzv);
     
-
+  
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Hz, xchecks,zerrors,pxv,num_iter,lmax,rankz);
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,pxv,num_iter,lmax);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
        
 	  num_of_x_suc_dec++;
-	  Hz_suc= quan_decode(Hz,Hx, zchecks,xerrors,pzv,num_iter,lmax,rankx);
+	  Hz_suc= quan_decode(Hz,Gx, zchecks,xerrors,pzv,num_iter,lmax);
 	 
 	  if (Hz_suc==true){num_of_suc_dec++;}
 	}     
@@ -156,7 +169,7 @@ int main(int argc, char **argv){
       
    ofstream myfile;
    myfile.open (data_file,ios::app);
-   myfile << n<<"  "<< num_of_suc_dec<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
+   myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<num_of_suc_dec<<endl;
    myfile.close();
 
      
