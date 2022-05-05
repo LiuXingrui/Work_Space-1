@@ -34,10 +34,7 @@ M2, M3... are some matrices from MayKay's website.
  
  `./display <H>` prints a dense mat.  
 
- Check script_toric.py and Makefile for more commands.
+ Check create_toric_mat.py and Makefile for more commands.
  
  pyplot is for ploting.  
  
- BP_analysis.cpp will output all the messages after each iteration.  
-  bptest is the executable program.  
-  `./bptest  <file_name which stored a parity check matrix>  <error probability>  <number of codewords>  <max  iterations>`
