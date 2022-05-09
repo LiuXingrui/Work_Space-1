@@ -112,9 +112,9 @@ int main(int argc, char **argv){
   //cout<<Hx*Hz.transpose()<<endl;
   
   GF2mat Gx=get_gen(Hx);
-  //cout<<Gx*Hx.transpose()<<endl;
+  //cout<<Gx*(Hx.transpose())<<endl;
   GF2mat Gz=get_gen(Hz);
-  // cout<<Gz*Hx.transpose()<<endl;
+  // cout<<Gz*(Hz.transpose())<<endl;
   
   nodes  xchecks[r1];//checks for Hx and Z errors
   nodes  zerrors[n];
@@ -142,13 +142,13 @@ int main(int argc, char **argv){
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,pxv,num_iter,lmax);
+      Hx_suc= quan_decode(Hx,Gx, xchecks,zerrors,pxv,num_iter,lmax);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
        
 	  num_of_x_suc_dec++;
-	  Hz_suc= quan_decode(Hz,Gx, zchecks,xerrors,pzv,num_iter,lmax);
+	  Hz_suc= quan_decode(Hz,Gz, zchecks,xerrors,pzv,num_iter,lmax);
 	 
 	  if (Hz_suc==true){num_of_suc_dec++;}
 	}     
@@ -169,7 +169,7 @@ int main(int argc, char **argv){
       
    ofstream myfile;
    myfile.open (data_file,ios::app);
-   myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<num_of_suc_dec<<endl;
+   myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
    myfile.close();
 
      

@@ -81,7 +81,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
  
   GF2mat zero_mat1(c,1);
   GF2mat zero_mat2(v,1);
-  GF2mat zero_rvec2(v-c,1);
+  GF2mat zero_rvec2(v-GF2mat_rank(H),1);
   GF2mat real_e(v,1);  //the error vector which is a column vector,
 
   
@@ -126,7 +126,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  if (H*output_e==syndrome)
 	    {
 	      // num_iter=num_iter+l;
-	     
+	      // cout<<G*(output_e+real_e)<<endl;
+	      // cout<<"rvec"<<zero_rvec2<<endl;
 	      if(G*(output_e+real_e)==zero_rvec2)
 		{
 		  // cout<<"suc! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
@@ -138,7 +139,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		}
 	       else
 	      	{
-		  // cout<<"failure! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
+		  //  cout<<"failure! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
 		  //cout<<"failure, e-e' is in NS"<<endl;
 	      	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
@@ -207,16 +208,19 @@ GF2mat get_gen(const GF2mat &H){
   int n=H.cols();
   int k=n-r;
 
-  GF2mat C=U.get_submatrix(0,0,r-1,n-r-1);
+
+  GF2mat G=T.get_submatrix(Hrank,0,n-1,n-1);
+    // GF2mat C=U.get_submatrix(0,0,r-1,n-r-1);
+  // cout<<"test:"<<testmat*HT<<endl;
   // cout<<C.cols()<<"  "<<C.rows()<<endl;
  
   // GF2mat C=CT.transpose();
-  bmat Ik;
-  Ik=eye_b(k);
+  //bmat Ik;
+  // Ik=eye_b(k);
   // cout<<Ik.cols()<<endl;
-  GF2mat I(Ik);
+  //GF2mat I(Ik);
   //cout<<I.cols()<<endl;
-  GF2mat G= merge_mat_hori(I,C);
+  // GF2mat G= merge_mat_hori(I,C);
   return G;
 
 
