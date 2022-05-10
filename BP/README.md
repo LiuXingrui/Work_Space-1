@@ -2,7 +2,7 @@ original_BP will randomly generate some error vectors and decode them by belief 
 
 The executable programs cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
 
-  `./new_sequential  <H_file> <data_file> <pmin> <pmax>   <number of codewords>  <max  iterations>`
+  `./new_sequential  <H_file> <data_file> <pmin> <pmax>   <number of codewords>  <max  iterations>`   
   The data stored in data_file are n fail_rate avg_p  avg_iter number_of_suc_decoding bit_error_rate_after_decoding   
  
 An example for the parity check matrix file:
@@ -22,7 +22,7 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between 0.5p and 1.5p:  
-  `./qBP <Hx_file> <Hz_file>  <pmin> <pmax> <number of codewords><lmax> <data_file>`  
+  `./qBP <Hx_file> <Hz_file>  <pmin> <pmax> <number of codewords><lmax> <data_file>`    
    The data stored in data_file are n fail_rate avg_p  avg_iter number_of_suc_decoding   
 
   gen_cyclic.cpp will create a rank=r-1 parity check matrix file for a cyclic code, r is the number of rows:  
