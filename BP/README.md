@@ -21,7 +21,7 @@ M2, M3... are some matrices from MayKay's website.
   `./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>`
   
   
-  qBP will decode CSS code with error probability distributed between 0.5p and 1.5p:  
+  qBP will decode CSS code with error probability distributed between pmin and pmax:  
   `./qBP <Hx_file> <Hz_file>  <pmin> <pmax> <number of codewords><lmax> <data_file>`    
    The data stored in data_file are n fail_rate avg_p  avg_iter number_of_suc_decoding   
 
