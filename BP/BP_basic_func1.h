@@ -32,7 +32,7 @@ void initialize_errors(const GF2mat &H, nodes errors[]);
 void initialize_massages(mat &mcv,mat& mvc,const GF2mat &H);
 
 //do a  parallel update 
-void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e);
+void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,vec &pv,int c, int v,  GF2mat& output_e);
 
 //do a  sequential update 
 void s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e);
@@ -63,4 +63,4 @@ bmat merge_mat_hori2(const bmat &left,const bmat &right);
 void write_matrix(string file_name, GF2mat &H);
 void write_matrix2(string file_name, bmat &H);
 
-int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p);
+int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes errors[],double& num_iter, int lmax,int & er,vec & pv);

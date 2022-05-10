@@ -28,79 +28,66 @@ using namespace itpp;
 // the first element stored in the file is 1 rathar than 0.
 
 int main(int argc, char **argv){
-  double p;
-  int num_of_cws;
-  string file_name;
-  int lmax;
-  //get the parameters:
-  
-  if (argc >= 2)
-    {
-        file_name=argv[1];
-	if (argc>=3)
-	  {
-        istringstream argv2( argv[2] );	
-	if ( argv2 >> p){}
-	else
-	  {
-	    cout<<"p should be a double"<<endl;
-	    return 1;
-	  }
-	if (argc>=4)
-	  {
-	    istringstream argv3( argv[3] );
-	    if ( argv3 >> num_of_cws){}
-	    else
-	      {
-		cout<<"num_of_cws should be an int"<<endl;
-		return 1;
-	      }
-	    if (argc>=5)
-	      {
-		istringstream argv4( argv[4] );
-		  if ( argv4 >> lmax){}
-		  else
-		    {
-		      cout<<"lmax should be an int"<<endl;
-		      return 1;
-		    }
-		if (argc>=6)
-		  {
-		    cout<<"more than 4 paremeters, example: my_prog file_name p num_of_cws lmax"<<endl;
-		    return 1;
-		  }
-	
-	      }
-	    //default parameters:
-	    else
-	      {
-		lmax=20;
-	      }
-	  }
-	else
-	  {
-	    num_of_cws=10000;
-	    lmax=20;
-	  }
-
-	  }
-	else
-	  {	 
-	    p=0.01;
-	    num_of_cws=10000;
-	    lmax=20;
-	  }
-    }
-  else
-    {
-       file_name="M2";
-       p=0.01;
-       num_of_cws=100;
-       lmax=20;
-    }
 
   GlobalRNG_randomize ();
+  double pmax;
+  double pmin;
+  int num_of_cws;
+  string file_name;
+  string data_file;
+  int lmax;
+  
+  if (argc!=7){
+    cout<<" # of parameters!=6, use default parameters"<<endl;
+    file_name="M2";
+    pmin=0.005;
+    pmax=0.015;
+    num_of_cws=1200;
+    data_file="cla_p0.005-0.015_data.txt";
+    lmax=20;
+
+  }
+  //get the parameters: 
+  else{
+    
+  file_name=argv[1];
+  data_file=argv[2];
  
+  istringstream argv3( argv[3] );	
+  if ( argv3 >> pmin){}
+  else
+    {
+      cout<<"pmin should be a double"<<endl;
+      return 1;
+    }
+
+  istringstream argv4( argv[4] );
+  if ( argv4 >> pmax){}
+  else
+    {
+      cout<<"pmax should be a double"<<endl;
+      return 1;
+    }
+	   
+	     
+  istringstream argv5( argv[5] );
+  if ( argv5 >> num_of_cws){}
+  else
+    {
+      cout<<"num_of_cws should be an int"<<endl;
+      return 1;
+    }
+	        
+  istringstream argv6( argv[6] );
+  if ( argv6 >> lmax){}
+  else
+    {
+      cout<<"lmax should be an int"<<endl;
+      return 1;
+    }
+
+
+  }
   double num_iter=0.0; //for calculate average iterations
   int num_of_suc_dec=0;// number of successfully decoded results
   int n_valid_cws=0;  // number of  decoded results that are cordwords
@@ -120,26 +107,38 @@ int main(int argc, char **argv){
   //cout<<H<<endl;
   nodes  checks[c];
   nodes  errors[v];
-  BSC bsc(p);
   int E=0;
   //find the neighbourhoods of all nodes:
   initialize_checks (H, checks,  E);
   initialize_errors(H, errors);
   int k=n-GF2mat_rank(H);
   int er=0;  //er is the number of bits that are wrong after decoding
+
+  vec pv(n);   
+  pro_dist( pmin,pmax, pv);
   
   for (int s=0;s<num_of_cws;s++)
     {     
-      num_of_suc_dec= num_of_suc_dec+cla_decode( v,c,H, checks, errors,bsc, num_iter,  lmax, er,p);
+      num_of_suc_dec= num_of_suc_dec+cla_decode( v,c,H, checks, errors, num_iter,  lmax, er,pv);
     }
   
-  cout<<"for p="<<p<<", there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a ["<<v<<", "<<k<<"] code"<<endl;
+  cout<<"for p in ("<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a ["<<v<<", "<<k<<"] code"<<endl;
   // cout<<"and there are "<< n_valid_cws<<" decoding results are codewords"<<endl;
   cout<<"bit error rate after decoding is ";
   cout<<er/(1.0*n*num_of_cws)<<endl;
   // cout<< "number of zero errors:    "<<num_zero_cws<<endl;
   cout<<"average iterations:"<<endl;
   cout<<num_iter/num_of_suc_dec<<endl;
+
+
+
+  double midp=(pmax+pmin)/2;
+      
+  ofstream myfile;
+  myfile.open (data_file,ios::app);
+  myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<"  "<<er/(1.0*n*num_of_cws)<<endl;
+  myfile.close();
+
   return 0;
 }
 

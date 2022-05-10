@@ -5,7 +5,16 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
+
+#ifndef basic
+#define basic
 #include"BP_basic_func1.h"
+#endif
+
+#ifndef quantum
+#define quantum
+#include"BP_quantum_func1.h"
+#endif
 
 using namespace std;
 #include <itpp/itbase.h>
@@ -73,10 +82,9 @@ void initialize_massages(mat &mcv,mat& mvc,const GF2mat &H){
 }
 
 //in fact, it is a sequential update schedule.
-void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,double p,int c, int v,  GF2mat& output_e){
+void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,vec& pv,int c, int v,  GF2mat& output_e){
   
-    double ipr=(1-p)/p;
-
+   
   for (int i=0;i<c;i++)
     {
       int ci_degree=checks[i].degree;
@@ -85,7 +93,8 @@ void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
     for (int j=0;j<ci_degree;j++)
       {            
 	int vnode=(checks[i].neighbors)(j);
-       
+        double ipr=(1-pv[vnode])/pv[vnode];
+
 	update_vj_to_ci(checks, errors,mcv, mvc,vnode,i, ipr);	
       }
     }
@@ -93,7 +102,7 @@ void p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const 
   for (int j=0;j<v;j++)
     {
    int vj_degree=errors[j].degree;
-   double  final_pr=ipr;
+   double  final_pr=(1-pv[j])/pv[j];;
 
    for (int i=0;i<vj_degree;i++)
      {
@@ -211,17 +220,16 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
 }
 
 
-int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes errors[],BSC &bsc,double& num_iter, int lmax,int & er,double p){
+int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes errors[],double& num_iter, int lmax,int & er,vec& pv){
 
   int n=v;
-  bvec real_eT(v);    //the transposed error vector, which is a row vector.
-  real_eT.zeros();
-  
+ 
   //if no error, break
-  bvec zero_vec(v);
-  zero_vec.zeros();
-  real_eT=bsc(zero_vec);
+ 
   
+  GF2mat real_eT(1,v);    
+  error_channel(real_eT, pv);
+  GF2mat zero_vec(1,v);
   if (real_eT==zero_vec)
     {
       // cout<<"suc, no error"<<endl;
@@ -235,7 +243,7 @@ int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes err
      
   for (int q=0;q<v;q++)
     {
-      real_e.set(q,0,real_eT(q));
+      real_e.set(q,0,real_eT(0,q));
     }
   GF2mat syndrome=H*real_e;
 
@@ -258,7 +266,7 @@ int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes err
       for (int l=1;l<=lmax;l++)
 	{
 	  //  cout<<l<<endl;
-	  p_update(checks,errors, mcv,mvc,syndrome,p, c, v,output_e);
+	  p_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
 	  
 	  if (H*output_e==syndrome)
 	    {
