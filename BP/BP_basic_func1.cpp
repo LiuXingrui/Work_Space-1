@@ -282,7 +282,7 @@ int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes err
 		}
 	      else
 		{
-		  cout<<"error!,get the wrong e"<<endl;
+		  //cout<<"error!,get the wrong e"<<endl;
 		  er=er+ distance(output_e, real_e, n);	  
 		  return 0;		       
 		}	    	  
