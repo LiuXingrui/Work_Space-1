@@ -22,8 +22,9 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between pmin and pmax:  
-  `./qBP <Hx_file> <Hz_file>  <pmin> <pmax> <number of codewords><lmax> <data_file>`    
-   The data stored in data_file are n fail_rate avg_p  avg_iter number_of_suc_decoding   
+  `./qBP <Hx_file> <Hz_file>  <pmin/wt> <pmax/dec_method> <number of codewords><lmax> <data_file>`    
+   The data stored in data_file are n fail_rate avg_p/wt  avg_iter number_of_suc_decoding.
+   if "pmin/wt">=1, then it will be explained as weight of errors, then dec_method>1 for same p and dec_method<0 for diff q.  
 
   gen_cyclic.cpp will create a rank=r-1 parity check matrix file for a cyclic code, r is the number of rows:  
   `./gen_cyc <file for storing> <n> <h_k> <h_k-1> ...<h_0>`
