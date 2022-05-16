@@ -189,7 +189,14 @@ int main(int argc, char **argv){
       
    ofstream myfile;
    myfile.open (data_file,ios::app);
-   myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
+   if (wt==0)
+     {
+       myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
+     }
+   else
+     {
+       myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
+     }
    myfile.close();
 
      
