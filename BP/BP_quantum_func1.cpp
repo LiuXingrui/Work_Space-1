@@ -46,6 +46,38 @@ void error_channel(GF2mat &cw, const vec &p){
 }
 
 
+void error_channel2(GF2mat &error, int wt){
+ 
+  double temp2;
+  bin one=1;
+  int n=error.cols();
+  
+
+    for (int i=0;i<wt;i++)
+      {    
+	temp2=randi(0,n-1);
+	error.set(0,temp2,one);	      
+  }
+    if(weight(error)!=wt)
+      
+      { GF2mat error2(1,n);
+	error=error2;
+	//cout<<"!=wt, try again"<<endl;
+	error_channel2(error,wt);
+      }
+}
+
+int weight(GF2mat &cw)
+{
+  int n=cw.cols();
+  int wt=0;
+  for (int i=0;i<n;i++)
+    {
+      if(cw(0,i)==1){wt++;}
+    }
+  return wt;
+}
+  
 void pro_dist(double pmin,double pmax, vec& pv){
 
  
@@ -61,13 +93,22 @@ void pro_dist(double pmin,double pmax, vec& pv){
     }
 }
 
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt){
   int v=H.cols();
   int c=H.rows();
   // int r2=H2.rows();
   GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
-  
+
+  if (wt==0)
+
+    {
   error_channel(real_eT, pv);
+    }
+  else
+    {
+      error_channel2(real_eT,wt);
+    }
+
   // cout<<pv<<endl;
 
   //if no error, break

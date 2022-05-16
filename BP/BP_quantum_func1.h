@@ -19,6 +19,8 @@ using namespace itpp;
 
 // a "bsc" channel that different qubit has different error probablity
 void error_channel(GF2mat &cw, const vec &p);
+void error_channel2(GF2mat &error, int wt);
+int weight(GF2mat &cw);
 
 //get a error probability vector whose components are random from 0.5p t0 1.5p
 void pro_dist(double pmin,double pmax, vec& pv);
@@ -27,7 +29,7 @@ void pro_dist(double pmin,double pmax, vec& pv);
 void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e);
 
 //decode an all-X or an all-Z error for a CSS code
-bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax);
+bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt=0);
 
 GF2mat get_gen(const GF2mat &H);
 int GF2mat_rank(const GF2mat& H);

@@ -33,8 +33,12 @@ int main(int argc, char **argv){
   string file_name2;
   string data_file;
   int lmax;
-  
-  if (argc!=8){cout<<" need 7 parameters: ./qBP  Hx_file Hz_file pmin pmax  num_of_cws lmax data_file"<<endl;return 1;}
+  int wt;
+  int dec_method;
+
+  //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
+  //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
+  if (argc!=8){cout<<" need 7 parameters: ./qBP  Hx_file Hz_file pmin/wt pmax/dec_method  num_of_cws lmax data_file"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -48,7 +52,7 @@ int main(int argc, char **argv){
       cout<<"pmin should be a double"<<endl;
       return 1;
     }
-
+  
   istringstream argv4( argv[4] );
   if ( argv4 >> pmax){}
   else
@@ -56,7 +60,7 @@ int main(int argc, char **argv){
       cout<<"pmax should be a double"<<endl;
       return 1;
     }
-	   
+ 
 	     
   istringstream argv5( argv[5] );
   if ( argv5 >> num_of_cws){}
@@ -98,6 +102,22 @@ int main(int argc, char **argv){
   //are the parity check matrices right?
   if (n1!=n2){cout<<"nx!=nz, the two matrices donot match"<<endl;return 1;}  
   n=n1;
+  
+   if (pmin>=1)
+    {
+      wt=pmin;
+      dec_method=pmax;
+     
+      if (dec_method<0){cout<<"diff p decode, pmin=wt/n*0.5, pmax=wt/n*1.5:"<<endl;pmin=0.5*wt/n;pmax=1.5*wt/n;}
+      else if (dec_method>1){cout<<"same p decode p=wt/n: "<<endl;;pmin=1.0*wt/n;pmax=pmin;}
+      else {cout<<"pmin>=1 but dec_method is wrong, dec_method<0 for diff_p, dec_method>1 for same p"<<endl;return 1;}
+      cout<<"for wt "<<wt<<" errors:"<<endl;
+    }
+   else
+     {
+       wt=0;// for p_min, pmax decode
+     }
+  
   r=r1+r2;
   int rankx=GF2mat_rank(Hx);
   int rankz=GF2mat_rank(Hz);
@@ -142,13 +162,13 @@ int main(int argc, char **argv){
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gx, xchecks,zerrors,pxv,num_iter,lmax);
+      Hx_suc= quan_decode(Hx,Gx, xchecks,zerrors,pxv,num_iter,lmax,wt);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
        
 	  num_of_x_suc_dec++;
-	  Hz_suc= quan_decode(Hz,Gz, zchecks,xerrors,pzv,num_iter,lmax);
+	  Hz_suc= quan_decode(Hz,Gz, zchecks,xerrors,pzv,num_iter,lmax,wt);
 	 
 	  if (Hz_suc==true){num_of_suc_dec++;}
 	}     
@@ -160,7 +180,7 @@ int main(int argc, char **argv){
    cout<<"average iterations:"<<endl;
    if((num_of_x_suc_dec+num_of_suc_dec)!=0)
      {
-   cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<endl;
+       cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"\n\n"<<endl;
      }
    else{cout<<0<<endl;}
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
