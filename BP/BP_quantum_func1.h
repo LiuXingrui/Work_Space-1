@@ -33,3 +33,7 @@ bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[
 
 GF2mat get_gen(const GF2mat &H);
 int GF2mat_rank(const GF2mat& H);
+
+bool  quan_decode_ana(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int &syn_fail, int& max_fail);
+
+void err_pos(const nodes errors[],const GF2mat &error);

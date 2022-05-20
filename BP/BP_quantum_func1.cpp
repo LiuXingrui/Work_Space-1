@@ -195,6 +195,115 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
  }
 
 
+bool  quan_decode_ana(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int &syn_fail,int &max_fail){
+  int v=H.cols();
+  int c=H.rows();
+  GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
+
+  if (wt==0)
+
+    {
+  error_channel(real_eT, pv);
+    }
+  else
+    {
+      error_channel2(real_eT,wt);
+    }
+
+ 
+
+  //if no error, break
+  GF2mat zero_rvec(1,v);
+ 
+  if (real_eT==zero_rvec)
+    {
+	 
+      return true;
+    }
+ 
+  GF2mat zero_mat1(c,1);
+  GF2mat zero_mat2(v,1);
+  GF2mat zero_rvec2(v-GF2mat_rank(H),1);
+  GF2mat real_e(v,1);  //the error vector which is a column vector,
+
+  
+  for (int q=0;q<v;q++)
+    {
+      real_e.set(q,0,real_eT(0,q));
+    }
+  
+  GF2mat syndrome=H*real_e;
+
+  //is the syndrome a zero vector?
+  if (syndrome==zero_mat1)
+	{
+	  // is e a stablizer?
+	  if (G*real_e==zero_rvec2)
+	    {
+	      
+	      return true;
+	    }        
+	  else  
+	    {
+	      cout<<"\n syndrome is 0, but decode fails"<<endl;
+	      syn_fail++;
+	      return false;
+	     
+	    }  
+	}
+  
+      mat mcv(c,v);   // the messages from check nodes to variable nodes, which are p0/p1
+      mat mvc(c,v);   // the messages from variable nodes to check nodes
+      mcv.zeros();
+      mvc.zeros();
+      initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
+      GF2mat output_e(v,1);
+     
+      
+      for (int l=1;l<=lmax;l++)
+	{
+	  //  cout<<l<<endl;
+	  quan_s_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
+	 
+	  if (H*output_e==syndrome)
+	    {
+	      // num_iter=num_iter+l;
+	      // cout<<G*(output_e+real_e)<<endl;
+	      // cout<<"rvec"<<zero_rvec2<<endl;
+	      if(G*(output_e+real_e)==zero_rvec2)
+		{
+        
+		  num_iter= num_iter+l;
+		  return true;
+	        }
+	       else
+	      	{
+		  cout<<"\n syndrome is ok, but decoding fails:"<<endl;
+		  syn_fail++;
+		  cout<<"\n real_e:"<<endl;
+		  err_pos(errors,real_e);
+
+		  cout<<"\n output_e:"<<endl;
+		  err_pos(errors,output_e);
+	      	  return false;
+        	        
+	      	}	    	  
+	    }
+	  
+	}
+
+       cout<<"\n reach maximum iterations:"<<endl;
+		  
+       cout<<"\n real_e:"<<endl;
+       err_pos(errors,real_e);
+
+       cout<<"\n output_e:"<<endl;
+       err_pos(errors,output_e);
+       
+       max_fail++;
+       return false;
+ }
+
   void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e){
   
     double ipr;
@@ -251,19 +360,31 @@ GF2mat get_gen(const GF2mat &H){
 
 
   GF2mat G=T.get_submatrix(Hrank,0,n-1,n-1);
-    // GF2mat C=U.get_submatrix(0,0,r-1,n-r-1);
-  // cout<<"test:"<<testmat*HT<<endl;
-  // cout<<C.cols()<<"  "<<C.rows()<<endl;
- 
-  // GF2mat C=CT.transpose();
-  //bmat Ik;
-  // Ik=eye_b(k);
-  // cout<<Ik.cols()<<endl;
-  //GF2mat I(Ik);
-  //cout<<I.cols()<<endl;
-  // GF2mat G= merge_mat_hori(I,C);
   return G;
 
 
-
 }
+
+
+void err_pos(const nodes errors[],const GF2mat &error){
+  int n=error.rows();
+ 
+  
+ 
+  // ivec pos; //an empty vector,ins() works well, 
+  // int pos_size=0;
+
+
+  for (int i=0;i<n;i++)
+    {
+      if (error(i,0)==1)
+	{
+	  // pos.ins(0,i);
+	  // pos_size++;
+	  cout<<i<<" neighbour checks: ";
+	  cout<<errors[i].neighbors<<endl;
+	}
+    }
+ 
+}
+  

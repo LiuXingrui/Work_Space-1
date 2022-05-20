@@ -38,7 +38,7 @@ int main(int argc, char **argv){
 
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=8){cout<<" need 7 parameters: ./qBP  Hx_file Hz_file pmin/wt pmax/dec_method  num_of_cws lmax data_file"<<endl;return 1;}
+  if (argc!=8){cout<<" need 7 parameters: ./qBPx  Hx_file Hz_file pmin/wt pmax/dec_method  num_of_cws lmax data_file"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -132,9 +132,11 @@ int main(int argc, char **argv){
   //cout<<Hx*Hz.transpose()<<endl;
   
   GF2mat Gx=get_gen(Hx);
-  //cout<<Gx*(Hx.transpose())<<endl;
+  cout<<"Hx=\n"<<Hx<<"\n \n Gx=\n"<<Gx<<endl;
+  cout<<"\nGx*HxT=\n"<<Gx*(Hx.transpose())<<endl;
   GF2mat Gz=get_gen(Hz);
-  // cout<<Gz*(Hz.transpose())<<endl;
+  cout<<"\n Hz=\n"<<Hz<<"\n \n Gz=\n"<<Gz<<endl;
+  cout<<"\nGz*HzT=\n"<<Gz*(Hz.transpose())<<endl;
   
   nodes  xchecks[r1];//checks for Hx and Z errors
   nodes  zerrors[n];
@@ -150,39 +152,37 @@ int main(int argc, char **argv){
   initialize_checks (Hz, zchecks,  E2);
   initialize_errors(Hz, xerrors);
 
-  vec pxv(n);
-  vec pzv(n);
+  vec px(n);
+
      
     
-  pro_dist( pmin,pmax, pxv);
-  pro_dist( pmin,pmax, pzv);
-    
+  pro_dist( pmin,pmax, px);
+ 
+  int syn_fail=0;
+  int max_fail=0;
   
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,pxv,num_iter,lmax,wt);
+      Hx_suc= quan_decode_ana(Hx,Gz, xchecks,zerrors,px,num_iter,lmax,wt,syn_fail,max_fail);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{
-       
-	  num_of_x_suc_dec++;
-	  Hz_suc= quan_decode(Hz,Gx, zchecks,xerrors,pzv,num_iter,lmax,wt);
-	 
-	  if (Hz_suc==true){num_of_suc_dec++;}
+       	 
+	  num_of_suc_dec++;
 	}     
     }
 
    
 
-   cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code"<<endl;
+   cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;
    cout<<"average iterations:"<<endl;
-   if((num_of_x_suc_dec+num_of_suc_dec)!=0)
-     {
-       cout<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"\n\n"<<endl;
-     }
-   else{cout<<0<<endl;}
+ 
+   cout<<num_iter/num_of_suc_dec<<"\n\n"<<endl;
+   cout<<"syn_fail="<<syn_fail<<endl;
+   cout<<"max_fail="<<max_fail<<endl;
+  
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
  
    double midp=(pmax+pmin)/2;
