@@ -38,7 +38,7 @@ int main(int argc, char **argv){
 
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=8){cout<<" need 7 parameters: ./qBPx  Hx_file Hz_file pmin/wt pmax/dec_method  num_of_cws lmax data_file"<<endl;return 1;}
+  if (argc!=8){cout<<" need 7 parameters: ./aqBP  Hx_file Hz_file pmin/wt pmax/range  num_of_cws lmax data_file"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -106,12 +106,12 @@ int main(int argc, char **argv){
    if (pmin>=1)
     {
       wt=pmin;
-      dec_method=pmax;
+      double range=pmax;
      
-      if (dec_method<0){cout<<"diff p decode, pmin=wt/n*0.5, pmax=wt/n*1.5:"<<endl;pmin=0.5*wt/n;pmax=1.5*wt/n;}
-      else if (dec_method>1){cout<<"same p decode p=wt/n: "<<endl;;pmin=1.0*wt/n;pmax=pmin;}
-      else {cout<<"pmin>=1 but dec_method is wrong, dec_method<0 for diff_p, dec_method>1 for same p"<<endl;return 1;}
+      
+      cout<<"pmin=wt/n*"<<1-range <<"pmax=wt/n"<<1+range<<":"<<endl;pmin=1.0*wt/n*(1-range);pmax=1.0*wt/n*(1+range);   
       cout<<"for wt "<<wt<<" errors:"<<endl;
+   
     }
    else
      {
