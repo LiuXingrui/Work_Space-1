@@ -26,8 +26,10 @@ M2, M3... are some matrices from MayKay's website.
    The data stored in data_file are n fail_rate avg_p/wt  avg_iter number_of_suc_decoding.
    if "pmin/wt">=1, then it will be explained as weight of errors, then range means p is from wt/n*(1-range,1+range).  
    qBPx only decode z-errors (use Hx).  
+   qBPx2 will decode the same error again use another random p_distribution if reaches maximum iterations.
    
-   aqBP gives more information.  
+   
+   aqBP gives more information.   aqBP_try_again works same way as qBPx2, aqBP_print_mes print messages after each iteration if the decodeing reaches the maximum iterations.
 
   gen_cyclic.cpp will create a rank=r-1 parity check matrix file for a cyclic code, r is the number of rows:  
   `./gen_cyc <file for storing> <n> <h_k> <h_k-1> ...<h_0>`
