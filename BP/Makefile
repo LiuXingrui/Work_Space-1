@@ -24,8 +24,17 @@ quan_BP:quantum_BP.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 ana_quan_BP:trapping_sets_ana.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 		${CPP}  `pkg-config --cflags itpp` -o aqBP trapping_sets_ana.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
 
+ana_quan_BP_try_again:trapping_sets_ana.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		${CPP}  `pkg-config --cflags itpp` -o aqBP_try_again trapping_sets_ana.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
+ana_quan_BP_print_mes:trapping_sets_ana.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		${CPP}  `pkg-config --cflags itpp` -o aqBP_print_mes trapping_sets_ana.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
 xquan_BP:quantum_BP_x_only.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 		${CPP}  `pkg-config --cflags itpp` -o xqBP quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
+xquan_BP2:quantum_BP_x_only.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		${CPP}  `pkg-config --cflags itpp` -o xqBP2 quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
 
 gen_cyc: gen_cyclic.cpp  BP_basic_func1.cpp
 	${CPP}  `pkg-config --cflags itpp` -o gen_cyc gen_cyclic.cpp  BP_basic_func1.cpp  `pkg-config --libs itpp`

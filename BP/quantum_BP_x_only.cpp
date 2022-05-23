@@ -35,10 +35,11 @@ int main(int argc, char **argv){
   int lmax;
   int wt;
   double range;
+  int num_dec;
 
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=8){cout<<" need 8 parameters: ./qBPx  Hx_file Hz_file pmin/wt pmax/range  num_of_cws lmax data_file"<<endl;return 1;}
+  if (argc!=8){cout<<" need 8 parameters: ./qBPx  Hx_file Hz_file pmin/wt pmax/range  num_of_cws lmax data_file "<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -70,14 +71,15 @@ int main(int argc, char **argv){
       return 1;
     }
 	        
-  istringstream argv6( argv[6] );
+ 
+
+    istringstream argv6( argv[6] );
   if ( argv6 >> lmax){}
   else
     {
       cout<<"lmax should be an int"<<endl;
       return 1;
     }
-		   		         	  
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
@@ -89,12 +91,6 @@ int main(int argc, char **argv){
   //read the parity check matrix:
   int n1,n2,n,k,r1,r2,r;
   
- 
-  // bmat Hx2=read_matrix2( n1,r1, file_name);
-  // bmat Hz2=read_matrix2( n2,r2, file_name2);
-  //bmat zero_mat12(r1,r2);
-  //cout<<Hx2*transpose(Hz2)<<endl;
-
   
   GF2mat Hx=read_matrix( n1,r1, file_name);
   GF2mat Hz=read_matrix( n2,r2, file_name2);
@@ -161,10 +157,10 @@ int main(int argc, char **argv){
       Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,num_iter,lmax,wt);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
-	{
-       	 
+	{       	 
 	  num_of_suc_dec++;
-	}     
+	}
+    
     }
 
    
