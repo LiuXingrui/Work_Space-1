@@ -22,9 +22,23 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between pmin and pmax:  
-  `./qBP <Hx_file> <Hz_file>  <pmin/wt> <pmax/range> <number of codewords><lmax> <data_file>`    
-   The data stored in data_file are n fail_rate avg_p/wt  avg_iter number_of_suc_decoding.
-   if "pmin/wt">=1, then it will be explained as weight of errors, then range means p is from wt/n*(1-range,1+range).  
+  `./qBP <Hx_file> <Hz_file>  <pavg/wt> <range> <number of codewords><lmax> <data_file><debug>`    
+   The data stored in data_file are  n d fail_rate pavg/wt range avg_iter_for_suc num_of_suc_dec num_of_cws syn_fail max_fail syn_fail_rate max_fail_rate:  
+   0:n  
+   1:d  
+   2: fail_rate  
+   3:pavg/wt  
+   4: range  
+   5:avg_iter_for_suc  
+   6:num_of_suc_dec  
+   7:  num_of_cws
+   8: syn_fail  
+   9:max_fail  
+   10:syn_fail_rate  
+   11: max_fail_rate  
+  
+   if "pavg/wt">=1, then it will be explained as weight of errors and pavg=wt/n.
+   
    qBPx only decode z-errors (use Hx).  
    qBPx2 will decode the same error again use another random p_distribution if reaches maximum iterations.
    
