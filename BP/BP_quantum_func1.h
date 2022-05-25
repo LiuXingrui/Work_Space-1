@@ -28,12 +28,13 @@ void pro_dist(double pmin,double pmax, vec& pv);
 //a quantum sequential update schedule: 
 void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e);
 
+void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat& pre_mcv,mat&pre_mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e);
 //decode an all-X or an all-Z error for a CSS code
-bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int &max_fail, int &syn_fail, int debug);
-bool  quan_decode2(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double pmin,double pmax,double& num_iter, int lmax,int wt, int num_dec);
+bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double pavg,double range,double& num_iter, int lmax,int wt,int &max_fail, int &syn_fail, int debug);
+
 GF2mat get_gen(const GF2mat &H);
 int GF2mat_rank(const GF2mat& H);
 
-bool  quan_decode_ana(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int &syn_fail, int& max_fail);
+
 
 void err_pos(const nodes errors[],const GF2mat &error);

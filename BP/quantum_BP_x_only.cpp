@@ -76,13 +76,23 @@ int main(int argc, char **argv){
 	        
  
 
-    istringstream argv6( argv[6] );
+  istringstream argv6( argv[6] );
   if ( argv6 >> lmax){}
   else
     {
       cout<<"lmax should be an int"<<endl;
       return 1;
     }
+
+  
+  istringstream argv8( argv[8] );
+  if ( argv8 >> debug){}
+  else
+    {
+      cout<<"debug should be an int"<<endl;
+      return 1;
+    }
+
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
@@ -158,7 +168,7 @@ int main(int argc, char **argv){
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,num_iter,lmax,wt,max_fail,syn_fail,debug);
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,pavg,range,num_iter,lmax,wt,max_fail,syn_fail,debug);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
@@ -169,6 +179,16 @@ int main(int argc, char **argv){
 
    
 
+   
+  if ((debug/2)%2==1)
+    {
+      cout<<"parallel decoding"<<endl;
+    }
+  else
+    {
+      cout<<"serial decodeing"<<endl;
+    }
+  
    cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;
    cout<<"average iterations:"<<endl;
  
