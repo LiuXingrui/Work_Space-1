@@ -34,12 +34,15 @@ int main(int argc, char **argv){
   string data_file;
   int lmax;
   int wt;
-  double range;
+  
   int num_dec;
-
+  int d=-1;
+  int debug=0;
+  double pavg;
+  double range;
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=8){cout<<" need 8 parameters: ./qBPx  Hx_file Hz_file pmin/wt pmax/range  num_of_cws lmax data_file "<<endl;return 1;}
+  if (argc!=9){cout<<" need 9 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -47,18 +50,18 @@ int main(int argc, char **argv){
   data_file=argv[7];
  
   istringstream argv3( argv[3] );	
-  if ( argv3 >> pmin){}
+  if ( argv3 >> pavg){}
   else
     {
-      cout<<"pmin should be a double"<<endl;
+      cout<<"pavg should be a double"<<endl;
       return 1;
     }
   
   istringstream argv4( argv[4] );
-  if ( argv4 >> pmax){}
+  if ( argv4 >> range){}
   else
     {
-      cout<<"pmax should be a double"<<endl;
+      cout<<"range should be a double"<<endl;
       return 1;
     }
  
@@ -83,6 +86,9 @@ int main(int argc, char **argv){
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
+  int max_fail=0;//number of fails that reach maximum iterations
+  int syn_fail=0;//number of fails that get the right syndrome but fails
+  
   bool Hx_suc=false;
   bool Hz_suc=false;
 
@@ -99,19 +105,20 @@ int main(int argc, char **argv){
   if (n1!=n2){cout<<"nx!=nz, the two matrices donot match"<<endl;return 1;}  
   n=n1;
   
-   if (pmin>=1)
+   if (pavg>=1)
     {
-      wt=pmin;
-      range=pmax;
+      wt=pavg;
+      pavg=1.0*wt/n;
      
-      cout<<"pmin=wt/n*"<<1-range <<"pmax=wt/n"<<1+range<<":"<<endl;pmin=1.0*wt/n*(1-range);pmax=1.0*wt/n*(1+range);   
+      cout<<"pmin=wt/n*"<<1-range <<"pmax=wt/n*"<<1+range<<":"<<endl;  
       cout<<"for wt "<<wt<<" errors:"<<endl;
     }
    else
      {
        wt=0;// for p_min, pmax decode
      }
-  
+  pmin=1.0*pavg*(1-range);
+  pmax=1.0*pavg*(1+range);
   r=r1+r2;
   int rankx=GF2mat_rank(Hx);
   int rankz=GF2mat_rank(Hz);
@@ -145,16 +152,13 @@ int main(int argc, char **argv){
   initialize_errors(Hz, xerrors);
 
   vec px(n);
-     
-    
-  pro_dist( pmin,pmax, px);
- 
-    
+         
+  pro_dist( pmin,pmax, px);  
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,num_iter,lmax,wt);
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,num_iter,lmax,wt,max_fail,syn_fail,debug);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
@@ -169,20 +173,22 @@ int main(int argc, char **argv){
    cout<<"average iterations:"<<endl;
  
    cout<<num_iter/num_of_suc_dec<<"\n\n"<<endl;
+   cout<<"syn_fail="<<syn_fail<<endl;
+   cout<<"max_fail="<<max_fail<<endl;
   
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
  
-   double midp=(pmax+pmin)/2;
+ 
       
    ofstream myfile;
    myfile.open (data_file,ios::app);
    if (wt==0)
      {
-       myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<midp<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
+       myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<pavg<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<endl;
      }
    else
      {
-       myfile << n<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<num_iter/(num_of_x_suc_dec+num_of_suc_dec)<<"  "<<num_of_suc_dec<<endl;
+          myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<endl;
      }
    myfile.close();
 

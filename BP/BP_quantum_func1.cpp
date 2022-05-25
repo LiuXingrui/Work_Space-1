@@ -213,7 +213,7 @@ bool  quan_decode2(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[
        return false;
  }
 
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug){
   int v=H.cols();
   int c=H.rows();
   // int r2=H2.rows();
@@ -264,7 +264,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	    }        
 	  else  
 	    {
-	    
+	      syn_fail++;
 	      return false;
 	     
 	    }  
@@ -295,44 +295,47 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		}
 	       else
 	      	{
-	   
+	          syn_fail++;
 	      	  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
 	      	}	    	  
 	    }
 	  
 	}
-       mcv.zeros();
-       mvc.zeros();
-       initialize_massages( mcv,mvc, H);
-        vec pv2(v);
-       pro_dist(0.5*wt/v,1.5*wt/v,pv2);
-        for (int l=1;l<=lmax;l++)
-	{
-	   
-	  quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e);
-	  
-	  if (H*output_e==syndrome)
-	    {
-	      
-	      if(G*(output_e+real_e)==zero_rvec2)
-		{
-       		  num_iter= num_iter+l;
-		  return true;
-	        }
-	       else
-	      	{
-		  // cout<<"\n syndrome is ok, but decoding fails:"<<endl;
-		  // syn_fail++;		
-	      	  return false;      	        
-	      	}
- 	    	  
-	    }	  
-	     
-	}
-       
 
-       return false;
+      if (debug=2)
+	{
+	  mcv.zeros();
+	  mvc.zeros();
+	  initialize_massages( mcv,mvc, H);
+	  vec pv2(v);
+	  pro_dist(0.5*wt/v,1.5*wt/v,pv2);
+	  for (int l=1;l<=lmax;l++)
+	    {
+	   
+	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e);
+	  
+	      if (H*output_e==syndrome)
+		{
+		  
+		  if(G*(output_e+real_e)==zero_rvec2)
+		    {
+		      num_iter= num_iter+l;
+		      return true;
+		    }
+		  else
+		    {
+		      // cout<<"\n syndrome is ok, but decoding fails:"<<endl;
+		      syn_fail++;		
+		      return false;      	        
+		    }
+ 	    	  
+		}	  
+	     
+	    }
+	}
+      max_fail++;
+      return false;
  }
 
 

@@ -29,7 +29,7 @@ void pro_dist(double pmin,double pmax, vec& pv);
 void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e);
 
 //decode an all-X or an all-Z error for a CSS code
-bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt);
+bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double& num_iter, int lmax,int wt,int &max_fail, int &syn_fail, int debug);
 bool  quan_decode2(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,double pmin,double pmax,double& num_iter, int lmax,int wt, int num_dec);
 GF2mat get_gen(const GF2mat &H);
 int GF2mat_rank(const GF2mat& H);
