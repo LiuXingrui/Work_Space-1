@@ -31,7 +31,7 @@ M2, M3... are some matrices from MayKay's website.
    4: range  
    5:avg_iter_for_suc  
    6:num_of_suc_dec  
-   7:  num_of_cws
+   7:  num_of_cws  
    8: syn_fail  
    9:max_fail  
    10:syn_fail_rate  
