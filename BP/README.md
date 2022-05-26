@@ -22,15 +22,17 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between pmin and pmax:  
-  `./qBP <Hx_file> <Hz_file>  <pavg/wt> <range> <number of codewords><lmax> <data_file><debug>`    
+  `./qBP <Hx_file> <Hz_file>  <pavg/wt> <range> <number of codewords><lmax> <data_file><debug><channel>`    
   debug%2==1: if reach maximum iteratios, try another p_dis, decode it again.  
   (debug/2)%2==1: parallel  schedule  
    (debug/4)%2==1: print messages after each iterations if reach max iterations  
+   channel==0: bsc, only decode z-errors(use Hx)  
+   channel==1: depolarizing, pavg is the depolarizing rate  
    
    
    The data stored in data_file are  n d fail_rate pavg/wt range avg_iter_for_suc num_of_suc_dec num_of_cws syn_fail max_fail syn_fail_rate max_fail_rate:  
    0:n  
-   1:d  
+   1:d  (have not calculate it in this prog yet, so outputs for d are setted to -1)
    2: fail_rate  
    3:pavg/wt  
    4: range  
