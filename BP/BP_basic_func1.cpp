@@ -204,7 +204,7 @@ void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
 }
 
 //update vj to ci massage:
-void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int j,int i,double ipr){
+void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int j,int i,double ipr,double alpha){
   
    int v_degree=errors[j].degree;
    mvc.set(i,j,ipr);
@@ -214,7 +214,7 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
       int ck=(errors[j].neighbors)(k);
       if (ck!=i)
 	{
-	  mvc.set(i,j,mvc(i,j)*mcv(ck,j));
+	  mvc.set(i,j,mvc(i,j)*pow(mcv(ck,j),1.0/alpha));
 	}
      }   
 }

@@ -52,7 +52,7 @@ void print_error_pos( const GF2mat &real_e,int n);
 
 void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int i,int j,bin s);
 
-void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int j,int i,double ipr);
+void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,int j,int i,double ipr,double alpha=1);
 
 GF2mat read_matrix (int& n,int &r, string & file_name);
 bmat read_matrix2 (int& n,int &r, string & file_name);

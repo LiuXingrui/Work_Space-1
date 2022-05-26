@@ -34,15 +34,17 @@ int main(int argc, char **argv){
   string data_file;
   int lmax;
   int wt;
-  
+  int channel;
   int num_dec;
   int d=-1;
   int debug=0;
   double pavg;
   double range;
+  double alpha;
+  double decode_p,decode_prange,decode_pmin,decode_pmax;
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=9){cout<<" need 9 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug"<<endl;return 1;}
+  if (argc!=13){cout<<" need 10 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug channel alpha decode_p decode_prange"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -93,6 +95,35 @@ int main(int argc, char **argv){
       return 1;
     }
 
+  istringstream argv9( argv[9] );
+  if ( argv9 >> channel){}
+  else
+    {
+      cout<<"channel should be an int"<<endl;
+      return 1;
+    }
+
+   istringstream argv10( argv[10] );
+  if ( argv10 >> alpha){}
+  else
+    {
+      cout<<"alpha should be double"<<endl;
+      return 1;
+    }
+ istringstream argv11( argv[11] );
+   if ( argv11 >> decode_p){}
+  else
+    {
+      cout<<"decode_p should be double"<<endl;
+      return 1;
+    }
+ istringstream argv12( argv[12] );
+    if ( argv12 >> decode_prange){}
+  else
+    {
+      cout<<"decode_prange should be double"<<endl;
+      return 1;
+    }
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
@@ -129,6 +160,8 @@ int main(int argc, char **argv){
      }
   pmin=1.0*pavg*(1-range);
   pmax=1.0*pavg*(1+range);
+  decode_pmin=1.0*decode_p*(1-decode_prange);
+  decode_pmax=1.0*decode_p*(1+decode_prange);
   r=r1+r2;
   int rankx=GF2mat_rank(Hx);
   int rankz=GF2mat_rank(Hz);
@@ -162,13 +195,17 @@ int main(int argc, char **argv){
   initialize_errors(Hz, xerrors);
 
   vec px(n);
+  vec px_dec(n);
+
+  
          
-  pro_dist( pmin,pmax, px);  
+  pro_dist( pmin,pmax, px);
+  pro_dist( decode_pmin,decode_pmax, px_dec);  
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,pavg,range,num_iter,lmax,wt,max_fail,syn_fail,debug);
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,alpha);
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
@@ -189,7 +226,7 @@ int main(int argc, char **argv){
       cout<<"serial decodeing"<<endl;
     }
   
-   cout<<"for p in ( "<<pmin<<", "<<pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;
+  cout<<"real_ p=  ( "<<pmin<<", "<<pmax<<"),decode_p=("<<decode_pmin<<", "<<decode_pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;
    cout<<"average iterations:"<<endl;
  
    cout<<num_iter/num_of_suc_dec<<"\n\n"<<endl;
