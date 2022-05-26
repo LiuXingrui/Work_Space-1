@@ -67,6 +67,39 @@ void error_channel2(GF2mat &error, int wt){
       }
 }
 
+void depolarizing(GF2mat &xerror,GF2mat &zerror, const vec &p){
+  double temp1,temp2;
+  bin one=1;
+  int n=xerror.cols();
+
+    for (int i=0;i<n;i++)
+      {    
+	temp2=randu();
+	if(temp2<p[i])
+	  {
+	    temp1=randu();
+	    if (temp1<0.25)
+	      {
+		xerror.set(0,i,xerror(0,i)+one);
+	      }
+	    else if (temp1>0.25&&temp1<0.5)
+	      {
+		 zerror.set(0,i,zerror(0,i)+one);
+	      }
+	    else if (temp1>0.5&&temp1<0.75)
+	      {
+		 zerror.set(0,i,zerror(0,i)+one);
+		 xerror.set(0,i,xerror(0,i)+one);
+	      }
+	    
+	  }	
+      }
+  
+  
+
+}
+
+
 int weight(GF2mat &cw)
 {
   int n=cw.cols();
@@ -209,11 +242,11 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	   
 	      if ((debug/2)%2==1)
 		{
-		  quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv, c, v,output_e);
+		  quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv2, c, v,output_e);
 		}
 	      else
 		{
-		  quan_s_update(checks,errors, mcv,mvc,syndrome,pv, c, v,output_e);
+		  quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e);
 		}
 	      
 	      if ((debug/4)%2==1)
