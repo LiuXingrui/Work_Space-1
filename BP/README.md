@@ -46,6 +46,8 @@ M2, M3... are some matrices from MayKay's website.
    9:max_fail  
    10:syn_fail_rate  
    11: max_fail_rate  
+   12: decode_p  
+   13:decode_prange  
   
    if "pavg/wt">=1, then it will be explained as weight of errors and pavg=wt/n.
    
