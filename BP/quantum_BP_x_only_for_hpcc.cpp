@@ -204,7 +204,8 @@ int main(int argc, char **argv){
   pro_dist( pmin,pmax, px);
   pro_dist( decode_pmin,decode_pmax, px_dec);  
   
-  // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
+  // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding
+     #pragma omp parallel for
    for (int s=0;s<num_of_cws;s++)
     {
       Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,alpha);
@@ -250,9 +251,9 @@ int main(int argc, char **argv){
           myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<decode_p<<"  "<<decode_prange<<endl;
      }
    myfile.close();
-    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+     std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> time_span = (end - start)/1000;
-    std::cout << "\n Run-time " << time_span.count() << " seconds.\n";
+    std::cout << "Run-time " << time_span.count() << " seconds.\n";
      
   return 0;
 

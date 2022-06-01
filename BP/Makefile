@@ -33,6 +33,9 @@ ana_quan_BP_print_mes:trapping_sets_ana.cpp  BP_quantum_func1.cpp BP_basic_func1
 xquan_BP:quantum_BP_x_only.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 		${CPP}  `pkg-config --cflags itpp` -o xqBP quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
 
+hquan_BP:quantum_BP_x_only_for_hpcc.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
+		${CPP} -std=c++11 -fopenmp  `pkg-config --cflags itpp` -o hqBP quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
 xquan_BP2:quantum_BP_x_only.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 		${CPP}  `pkg-config --cflags itpp` -o xqBP2 quantum_BP_x_only.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
 
