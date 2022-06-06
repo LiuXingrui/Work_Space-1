@@ -4,8 +4,8 @@ hpcc2= ``` `itpp-config --libs ` ```
 
 instead of  
 ``` `pkg-config --cflags itpp` ``` and   
-``` `pkg-config --libs itpp` ``` 
-
+``` `pkg-config --libs itpp` ```   
+And need recompile the .out files.  
 
 
 original_BP will randomly generate some error vectors and decode them by belief propagation.    
