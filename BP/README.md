@@ -1,10 +1,10 @@
 For cluster: use 
-hpcc1= ``itpp-config --cflags``  
-hpcc2= ``itpp-config --libs``  
+hpcc1= `\`itpp-config --cflag\s``  
+hpcc2= `\`itpp-config --libs\``  
 
 instead of  
-` `pkg-config --cflags itpp`` and   
-``pkg-config --libs itpp`` 
+` \`pkg-config --cflags itpp`\` and   
+`\`pkg-config --libs itpp\`` 
 
 
 
