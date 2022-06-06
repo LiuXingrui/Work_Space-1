@@ -1,3 +1,13 @@
+For cluster: use 
+hpcc1= ``itpp-config --cflags``  
+hpcc2= ``itpp-config --libs``  
+
+instead of  
+` `pkg-config --cflags itpp`` and   
+``pkg-config --libs itpp`` 
+
+
+
 original_BP will randomly generate some error vectors and decode them by belief propagation.    
 
 The executable programs cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
