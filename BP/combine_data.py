@@ -24,14 +24,10 @@ for i in range(rows):
         
 
 newdata[0,5]=newdata[0,5]/float(newdata[0,7])
-print(newdata[0,5])
 newdata[0,2]=(newdata[0,7]-newdata[0,6])/float(newdata[0,7])
-print(newdata[0,2])
 newdata[0,10]=newdata[0,8]/float(newdata[0,7])
-print(newdata[0,10])
-print(newdata[0,8])
 newdata[0,11]=newdata[0,9]/float(newdata[0,7])
-print(newdata[0,11])
 
 
+print(newdata)
 np.savetxt(target_file, newdata, fmt='%.6f',delimiter=' ', newline='\n', encoding=None)
