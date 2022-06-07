@@ -45,9 +45,9 @@ M2, M3... are some matrices from MayKay's website.
    
    The data stored in data_file are  n d fail_rate pavg/wt range avg_iter_for_suc num_of_suc_dec num_of_cws syn_fail max_fail syn_fail_rate max_fail_rate:  
    0:n  
-   1:d  (have not calculate it in this prog yet, so outputs for d are setted to -1)
-   2: fail_rate  
-   3:pavg/wt  
+   1:d  (have not calculate it in this prog yet, so outputs for d are setted to -1)  
+   2: fail_rate    
+   3:pavg/wt    
    4: range  
    5:avg_iter_for_suc  
    6:num_of_suc_dec  
