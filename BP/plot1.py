@@ -16,4 +16,3 @@ for max_wt in wt_list:
             os.system(command)  
       
     
-

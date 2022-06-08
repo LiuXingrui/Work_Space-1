@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 def combine(data_file_list,target_file):
     
-    n_data=data_file_list.len()
+    n_data=len(data_file_list)
     newdata=np.zeros((n_data,14))
     
     same=[0,1,3,4,12,13]
@@ -29,6 +29,7 @@ def combine(data_file_list,target_file):
         newdata[row_index,2]=(newdata[row_index,7]-newdata[row_index,6])/float(newdata[row_index,7])
         newdata[row_index,10]=newdata[row_index,8]/float(newdata[row_index,7])
         newdata[row_index,11]=newdata[row_index,9]/float(newdata[row_index,7])
+        row_index=row_index+1
     print(newdata)
     np.savetxt(target_file, newdata, fmt='%.6f',delimiter=' ', newline='\n', encoding=None)
 
@@ -38,8 +39,8 @@ for r in range_list:
     data_file_list_s=[]
     data_file_list_p=[]
     for p in pavg_list:
-        data_file_list_s.append("n200_range%.1f_p%.3f_serial2.data "%(r,p))
-        data_file_list_p.append("n200_range%.1f_p%.3f_parallel2.data "%(r,p))
+        data_file_list_s.append("n200_range%.1f_p%.3f_serial2.data"%(r,p))
+        data_file_list_p.append("n200_range%.1f_p%.3f_parallel2.data"%(r,p))
         
-    combine( data_file_list_s,"n200_range%.1f_serial2.data "%(r,p))
-    combine( data_file_list_p,"n200_range%.1f__parallel2.data "%(r,p))
+    combine( data_file_list_s,"n200_range%.1f_serial2.data"%r)
+    combine( data_file_list_p,"n200_range%.1f_parallel2.data"%r)
