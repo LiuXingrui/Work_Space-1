@@ -40,7 +40,7 @@ M2, M3... are some matrices from MayKay's website.
    channel==1: depolarizing, pavg is the depolarizing rate  
    alpha is for testing another method.  
    
-   decode_p/decode_prange are the p/range for decoding, pavg and range are the real p.  
+   decode_p/decode_prange are the p/range for decoding, pavg and range are the real p. In fact, it seems the real p_range does not matter???
    
    
    The data stored in data_file are  n d fail_rate pavg/wt range avg_iter_for_suc num_of_suc_dec num_of_cws syn_fail max_fail syn_fail_rate max_fail_rate:  
@@ -62,8 +62,6 @@ M2, M3... are some matrices from MayKay's website.
    if "pavg/wt">=1, then it will be explained as weight of errors and pavg=wt/n.
    
    qBPx only decode z-errors (use Hx).  
-   qBPx2 will decode the same error again use another random p_distribution if reaches maximum iterations.
-   
    
    aqBP gives more information.   aqBP_try_again works same way as qBPx2, aqBP_print_mes print messages after each iteration if the decodeing reaches the maximum iterations.
 
