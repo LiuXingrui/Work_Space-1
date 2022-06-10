@@ -38,12 +38,13 @@ range_list=[0.9]
 r=0.9
 p_range=[0.1,0.01,0.001]
 d_range=range(3,13)
-for p in pavg_list:
+for p in p_range:
     data_file_list_s=[]
     data_file_list_p=[]
     for d in d_range:
-        data_file_list_s.appendw("n%d_p%.3f_serial_2.data"%(d,p))
-        data_file_list_p.append("n%d_p%.3f_parallel_2.data"%(d,p))
+        n=d*d*2
+        data_file_list_s.append("n%d_p%.3f_serial_2.data"%(n,p))
+        data_file_list_p.append("n%d_p%.3f_parallel_2.data"%(n,p))
         
     combine( data_file_list_s,"n_p%.3f_serial_2.data"%(p))
     combine( data_file_list_p,"n_p%.3f_parallel_2.data"%(p))
