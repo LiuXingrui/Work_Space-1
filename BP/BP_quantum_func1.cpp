@@ -313,7 +313,7 @@ void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,c
        int cnode=(errors[j].neighbors)(i);
        update_ci_to_vj( checks, errors,mcv, mvc,cnode,j,syndrome(cnode,0));
 
-       final_pr=final_pr*mcv(cnode,j);
+       final_pr=final_pr*pow(mcv(cnode,j),1.0/alpha);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
 
@@ -348,7 +348,7 @@ void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,m
        int cnode=(errors[j].neighbors)(i);
        update_ci_to_vj( checks, errors,mcv, pre_mvc,cnode,j,syndrome(cnode,0));
 
-       final_pr=final_pr*mcv(cnode,j);
+       final_pr=final_pr*pow(mcv(cnode,j),1/alpha);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
 
