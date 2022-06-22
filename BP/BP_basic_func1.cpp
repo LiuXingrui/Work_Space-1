@@ -216,6 +216,10 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
 	{
 	  mvc.set(i,j,mvc(i,j)*pow(mcv(ck,j),1.0/alpha));
 	}
+      else
+	{
+	   mvc.set(i,j,mvc(i,j)*pow(mcv(ck,j),1.0-1.0/alpha));
+	}
      }   
 }
 
