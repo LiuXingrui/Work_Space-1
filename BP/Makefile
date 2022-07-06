@@ -1,9 +1,14 @@
 WARN =-Wall -Wsign-compare -Wextra
 CPP=g++ -O -g ${WARN} 
 
+hpcc:
+	ssh -X xliu261@cluster.hpcc.ucr.edu
 
 test: test.cpp  BP_quantum_func1.cpp BP_basic_func1.cpp
 	${CPP}  `pkg-config --cflags itpp` -o test test.cpp BP_quantum_func1.cpp BP_basic_func1.cpp  `pkg-config --libs itpp`
+
+test2: test.cpp 
+	${CPP}  `pkg-config --cflags itpp` -o test test.cpp   `pkg-config --libs itpp`
  
 
 gen_Hx:gen_surface.cpp

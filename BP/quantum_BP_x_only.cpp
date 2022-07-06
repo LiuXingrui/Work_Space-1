@@ -198,6 +198,7 @@ int main(int argc, char **argv){
 
   vec px(n);
   vec px_dec(n);
+  iver LR(n);
 
   
          
@@ -207,7 +208,11 @@ int main(int argc, char **argv){
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,alpha);
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,alpha);
+      if (Hx_suc==false&&(debug/8)%2==1)
+	{
+	  Hx_suc==OSD();
+	}
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
@@ -227,6 +232,12 @@ int main(int argc, char **argv){
     {
       cout<<"serial decodeing"<<endl;
     }
+
+  if ((debug/8)%2==1)
+    {
+      cout<<"use OSD if failed:"<<endl;
+    }
+  
 
   cout<<"alpha="<<alpha<<endl;
   cout<<"real_ p=  ( "<<pmin<<", "<<pmax<<"),decode_p=("<<decode_pmin<<", "<<decode_pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;

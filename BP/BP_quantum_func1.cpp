@@ -6,6 +6,7 @@
 #include <math.h> 
 #include <random>
 #include <sstream>
+#include <stdlib.h> 
 
 #ifndef basic
 #define basic
@@ -128,7 +129,7 @@ void pro_dist(double pmin,double pmax, vec& pv){
 
 
 //here pavg and range are decode_p/decode_prange
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug,double alpha){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,double alpha){
   int v=H.cols();
   int c=H.rows();
   // int r2=H2.rows();
@@ -201,11 +202,11 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  //  cout<<l<<endl;
 	  if ((debug/2)%2==1)
 	    {
-	      quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv_dec, c, v,output_e,alpha);
+	      quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
 	  else
 	    {
-	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,alpha);
+	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
 	  if (H*output_e==syndrome)
 	    {
@@ -242,11 +243,11 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	   
 	      if ((debug/2)%2==1)
 		{
-		  quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv2, c, v,output_e,alpha);
+		  quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv2, c, v,output_e,LR,alpha);
 		}
 	      else
 		{
-		  quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e,alpha);
+		  quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e,LR,alpha);
 		}
 	      
 	      if ((debug/4)%2==1)
@@ -284,9 +285,69 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
  }
 
 
+bool OSD(vec& LR,const GF2mat& H,int r,const GF2mat G, const GF2mat& synbdrome){ //r is the rank of H
+
+  //get the first permutation that abs_LLR is in descending order
+  int n=LR.length();
+  vec nega_abs_LLR(n); //the sort function gives a ascending  order, we need descending order
+  for (int i=0;i<n,i++)
+    {
+      if (LR(i)>=0) 
+	{
+	  nega_abs_LLR(i)=-abs(log(LR(i)));
+	}
+      else
+	{
+	  cout<<"error:get a negative Likelyhood-ratio in OSD function"<<endl;
+	  return false;
+	}
+    }
+
+  cout<<"ok, no negative likelyhood-ratia, please comment those debug lines before runninng on the cluster"<<endl;
+
+  
+  ivec perm1=sort_index(nega_abs_LLR);
+  GF2mat H1=H;  
+  H1.permute_cols(perm1,1);
 
 
-void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e,double alpha){
+  
+ 
+  //get the second permutation that gives first rank(H) linear_independent cols.
+  GF2mat H2(r,r);
+  bvec zero_vec(r);
+  ivec perm2(n);
+  ivec perm2_copy(n);
+  zero_vec.zeros();
+  H2.set_col(0,H1.get_col(0));
+  int j1=1;// the current col of H2
+  int j2=1; //the current col of H1
+
+  for (int i=0;i<n;i++){perm(i)=i;}
+
+  while (j1<r)
+    {
+      H2.set_col(j1,H1.get_col(j2));
+      if (row_rank(H2)==j1+1) {j1++;}
+      else
+	{
+	  H2.set_col(j1,zero_vec);
+	  perm2_copy=perm2;
+	  perm
+	  for (int i=j2,i<n-1;i++)
+	    {
+	      perm2(i)=perm2_copy(i+1);	      
+	    }
+	  perm2(n-1)=perm2_copy(j2);
+	  j2++;
+  
+    }
+      
+
+}
+
+
+void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
   
     double ipr;
 
@@ -316,12 +377,12 @@ void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,c
        final_pr=final_pr*pow(mcv(cnode,j),1.0/alpha);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
-
-       output_e.set(j,0,final_pr<1? 1:0);   
+   LR(j)=final_pr;
+   output_e.set(j,0,final_pr<1? 1:0);   
     }  
 }
 
-void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e,double alpha){
+void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
   
     double ipr;
 
@@ -351,8 +412,8 @@ void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,m
        final_pr=final_pr*pow(mcv(cnode,j),1/alpha);
       }   
        //  cout<<j<<"   "<<final_pr<<endl;
-
-       output_e.set(j,0,final_pr<1? 1:0);   
+    LR(j)=final_pr;
+    output_e.set(j,0,final_pr<1? 1:0);   
     }
   pre_mcv=mcv;
   pre_mvc=mvc;
