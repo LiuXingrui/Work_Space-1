@@ -111,6 +111,17 @@ int weight(GF2mat &cw)
     }
   return wt;
 }
+
+int s_weight(GF2mat &s)
+{
+  int k=s.rows();
+  int wt=0;
+  for (int i=0;i<k;i++)
+    {
+      if(s(i,0)==1){wt++;}
+    }
+  return wt;
+}
   
 void pro_dist(double pmin,double pmax, vec& pv){
 
@@ -132,6 +143,7 @@ void pro_dist(double pmin,double pmax, vec& pv){
 bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,double alpha){
   int v=H.cols();
   int c=H.rows();
+  int rankH=GF2mat_rank(H);
   // int r2=H2.rows();
   GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
 
@@ -158,7 +170,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
  
   GF2mat zero_mat1(c,1);
   GF2mat zero_mat2(v,1);
-  GF2mat zero_rvec2(v-GF2mat_rank(H),1);
+  GF2mat zero_rvec2(v-rankH,1);
   GF2mat real_e(v,1);  //the error vector which is a column vector,
 
   
@@ -213,7 +225,14 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	    
 	      if(G*(output_e+real_e)==zero_rvec2)
 		{
+		  /*
+		      cout<<"suc!"<<endl;
+		         GF2mat aaaa=H*output_e+syndrome;
+		  
+			 cout<<" wt of s-s_output is"<<s_weight(aaaa)<<endl;
+			 cout<<"wt of s is"<<s_weight(syndrome)<<endl;
 		  // cout<<"suc! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
+		  */
 		  num_iter= num_iter+l;
 		  return true;
 		
@@ -267,7 +286,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  if(G*(output_e+real_e)==zero_rvec2)
 		    {
 		      num_iter= num_iter+l;
-		      return true;
+		  
+			 return true;
 		    }
 		  else
 		    {
@@ -280,17 +300,36 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	     
 	    }
 	}
+      GF2mat syndrome2=H*output_e+syndrome;
+      //  cout<<" wt of s-s_output is"<<s_weight(syndrome2)<<endl;
+      // cout<<"wt of s is"<<s_weight(syndrome)<<endl;
+      //  cout<<"try OSD use s:"<<endl;
+      OSD(LR,H,syndrome,real_e,output_e);
+      if(G*(output_e+real_e)==zero_rvec2)
+		    {
+		      cout<<"OSD suc"<<endl;
+		  
+			 return true;
+		    }
+
+cout<<"OSD failed"<<endl;
       max_fail++;
       return false;
  }
 
 
-bool OSD(vec& LR,const GF2mat& H,int r,const GF2mat G, const GF2mat& synbdrome){ //r is the rank of H
+void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,GF2mat &output_e){ //r is the rank of H
 
+  
   //get the first permutation that abs_LLR is in descending order
+  GF2mat real_e=real_e1;
   int n=LR.length();
+    // cout<<"LR is \n"<<LR<<endl;
+
+  int r=H.rows();
+  int k=n-r;
   vec nega_abs_LLR(n); //the sort function gives a ascending  order, we need descending order
-  for (int i=0;i<n,i++)
+  for (int i=0;i<n;i++)
     {
       if (LR(i)>=0) 
 	{
@@ -298,53 +337,69 @@ bool OSD(vec& LR,const GF2mat& H,int r,const GF2mat G, const GF2mat& synbdrome){
 	}
       else
 	{
-	  cout<<"error:get a negative Likelyhood-ratio in OSD function"<<endl;
-	  return false;
+
+	  cout<<"something goes wrong in the OSD func"<<endl;
 	}
     }
-
-  cout<<"ok, no negative likelyhood-ratia, please comment those debug lines before runninng on the cluster"<<endl;
-
-  
+  //now we have H*perm1*perm1_inv*e=s, and def:H1=H*perm1
   ivec perm1=sort_index(nega_abs_LLR);
-  GF2mat H1=H;  
-  H1.permute_cols(perm1,1);
-
-
   
- 
-  //get the second permutation that gives first rank(H) linear_independent cols.
-  GF2mat H2(r,r);
-  bvec zero_vec(r);
-  ivec perm2(n);
-  ivec perm2_copy(n);
-  zero_vec.zeros();
-  H2.set_col(0,H1.get_col(0));
-  int j1=1;// the current col of H2
-  int j2=1; //the current col of H1
+  GF2mat H1=H;
+  H1.permute_cols(perm1,0);
+  GF2mat perm1_mat=col_permutation_matrix(perm1);
+  GF2mat perm1_mat_inv=perm1_mat.inverse();
+   
+  GF2mat T;
+  ivec perm2;
+  GF2mat U;
+  // now we have T*H1*perm2*perm2_inv*perm1_inv*e=T*s, def s1=T*s, U=T*H1*perm2, e1=perm2_inv*perm1_inv*e:
 
-  for (int i=0;i<n;i++){perm(i)=i;}
-
-  while (j1<r)
-    {
-      H2.set_col(j1,H1.get_col(j2));
-      if (row_rank(H2)==j1+1) {j1++;}
-      else
-	{
-	  H2.set_col(j1,zero_vec);
-	  perm2_copy=perm2;
-	  perm
-	  for (int i=j2,i<n-1;i++)
-	    {
-	      perm2(i)=perm2_copy(i+1);	      
-	    }
-	  perm2(n-1)=perm2_copy(j2);
-	  j2++;
-  
-    }
+  int rankH=H1.T_fact(T,U,perm2);
+  GF2mat perm2_mat=col_permutation_matrix(perm2);
+  GF2mat perm2_mat_inv=perm2_mat.inverse();
       
+  GF2mat syndrome1=T*syndrome;
+    //U may be not a full rank matrix, need to delete some rows. So also need to delete some rows of syndrome1
+  GF2mat H2=U.get_submatrix(0,0,rankH-1,n-1);
+  GF2mat syndrome2=syndrome1.get_submatrix(0,0,rankH-1,0);
+  
+  
+  // OSD-0: e1=(HS_inv*s2
+  //                  0   )
+  
+  GF2mat H_S=H2.get_submatrix(0,0,rankH-1,rankH-1);
+  GF2mat H_T=H2.get_submatrix(0,rankH,rankH-1,n-1);
+  GF2mat HS_inv=H_S.inverse();
+
+  GF2mat e_S=HS_inv*syndrome2;  
+  GF2mat e_T(n-rankH,1);
+
+  for (int i=0;i<rankH;i++){output_e.set(i,0,e_S(i,0));}
+  for (int i=rankH;i<n-1;i++){output_e.set(i,0,e_T(i-rankH,0));}
+ 
+  output_e=perm1_mat*perm2_mat*output_e;
+   	  	  
+
+  if (H*output_e==syndrome){cout<<"suc!"<<endl;}
+  else {cout<<"error H*output_e!=syndrom"<<endl;}
+  
+
+  
+}
+
+GF2mat col_permutation_matrix(ivec & perm)
+{
+  int n=perm.length();
+  GF2mat p(n,n);
+  for ( int i=0;i<n;i++)
+    {
+      p.set(perm(i),i,1);
+    }
+  return p;
+
 
 }
+
 
 
 void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
@@ -468,3 +523,187 @@ void err_pos(const nodes errors[],const GF2mat &error){
  
 }
   
+/*
+void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,GF2mat &output_e){ //r is the rank of H
+
+  
+  //get the first permutation that abs_LLR is in descending order
+  GF2mat real_e=real_e1;
+    int n=LR.length();
+    // cout<<"LR is \n"<<LR<<endl;
+
+    int r=H.rows();
+  int k=n-r;
+  vec nega_abs_LLR(n); //the sort function gives a ascending  order, we need descending order
+  for (int i=0;i<n;i++)
+    {
+      if (LR(i)>=0) 
+	{
+	  nega_abs_LLR(i)=-abs(log(LR(i)));
+	}
+      else
+	{
+
+	  cout<<"something goes wrong in the OSD func"<<endl;
+	}
+    }
+  //now we have H*perm1*perm1_inv*e=s, and def:H1=H*perm1
+  ivec perm1=sort_index(nega_abs_LLR);
+  
+  //  cout<<"perm1 is\n"<<perm1<<endl;
+  //  cout<<"H is \n"<<H<<endl;
+  real_e.permute_rows(perm1,0);
+
+  
+  GF2mat H1=H;
+  cout<<"H is"<<H<<endl;
+  cout<<"perm1 is"<<perm1<<endl;
+  H1.permute_cols(perm1,0);
+  cout<<"after .per, H is"<<H1<<endl;
+     GF2mat perm1_mat=col_permutation_matrix(perm1);
+     GF2mat perm1_mat_inv=perm1_mat.inverse();
+
+     GF2mat H11=H;
+     cout<<"perm1_mat is"<<perm1_mat<<endl;
+     H11=H11*perm1_mat;
+     cout<<"after mul,H is"<<H11<<endl;
+     
+  //  cout<<"after perm1, H is"<<H1<<endl;
+     if (H1*real_e==syndrome){cout<<" (H1*real_e==syndrome),ok"<<endl;}
+   else {cout<<" (H1*real_e!=syndrome),error"<<endl;}
+   
+  GF2mat T;
+  ivec perm2;
+  GF2mat U;
+  // now we have T*H1*perm2*perm2_inv*perm1_inv*e=T*s, def s1=T*s, U=T*H1*perm2, e1=perm2_inv*perm1_inv*e:
+  //notice U!=TH1P, this function gives a wrong P, so we need to do it ourselves.
+  int rankH=H1.T_fact(T,U,perm2);
+     GF2mat perm2_mat=col_permutation_matrix(perm2);
+     GF2mat perm2_mat_inv=perm2_mat.inverse();
+    
+  GF2mat H1copy=H1;
+  H1copy.permute_cols(perm2,0);
+  H1copy=T*H1copy;
+    cout<<"H1copy="<<H1copy<<endl;
+    cout<<"U is" <<U<<endl;
+    
+    GF2mat perm1_mat=mypermutation_matrix(perm1);
+      GF2mat perm2_mat=mypermutation_matrix(perm2);
+      GF2mat perm1_mat_inv=perm1_mat.inverse();
+        GF2mat perm2_mat_inv=perm2_mat.inverse();
+    
+  // GF2mat U2=U;
+  
+  // U2.permute_cols(perm2,0);
+  
+  // cout<<"UP2^-1 should be TH1"<<U2<<endl;
+  // cout<<"TH1 is"<<T*H1<<endl;
+
+  // U2.permute_cols(perm1,0);
+  
+  // cout<<"UP2^-1P1^-1 should be TH"<<U2<<endl;
+  // cout<<"TH is"<<T*H<<endl;
+  
+  //  cout<<"perm2 is"<<perm2<<endl; //perm2 should be close to Identity matrix
+  //  cout<<"U is"<<U<<endl;
+  
+  GF2mat syndrome1=T*syndrome;
+  real_e.permute_rows(perm2,0);
+    //U may be not a full rank matrix, need to delete some rows. So also need to delete some rows of syndrome1
+  GF2mat H2=U.get_submatrix(0,0,rankH-1,n-1);
+    if (U*real_e==syndrome1){cout<<" (U*real_e==syndrome1),ok"<<endl;}
+   else {cout<<" (U*real_e!=syndrome1),error"<<endl;}
+     
+
+ 
+
+
+  GF2mat syndrome2=syndrome1.get_submatrix(0,0,rankH-1,0);
+    if (H2*real_e==syndrome2){cout<<" (H2*real_e==syndrome2),ok"<<endl;}
+   else {cout<<" (H2*real_e!=syndrome2),error"<<endl;}
+  
+  // OSD-0: e1=(HS_inv*s2
+  //                  0   )
+  
+  GF2mat H_S=H2.get_submatrix(0,0,rankH-1,rankH-1);
+  GF2mat H_T=H2.get_submatrix(0,rankH,rankH-1,n-1);
+  // cout<<"HS is"<<H_S<<endl;
+  // cout<<"HT is"<<H_T<<endl;
+  // cout<<"H2 is"<<H2<<endl;
+ 
+  GF2mat HS_inv=H_S.inverse();
+
+  // cout<<"Hs_inv is"<<HS_inv<<endl;
+  //   cout<<"HS is"<<H_S<<endl;
+  GF2mat e_S=HS_inv*syndrome2;
+  
+  GF2mat e_T(n-rankH,1);
+  //   cout<<"eS is"<<e_S<<endl;
+  //cout<<"eT is"<<e_T<<endl;
+
+  for (int i=0;i<rankH;i++){output_e.set(i,0,e_S(i,0));}
+   for (int i=rankH;i<n-1;i++){output_e.set(i,0,e_T(i-rankH,0));}
+  
+
+     if (H2*output_e==syndrome2){cout<<"H2*output_e==syndrome2 ok"<<endl;}
+   else {cout<<"error H*2output_e!=syndrom2"<<endl;}
+         if (U*output_e==syndrome1){cout<<"U*output_e==syndrome1 ok"<<endl;}
+   else {cout<<"error U*output_e!=syndrom1"<<endl;}
+  //   cout<<"output_e before perm is"<<output_e<<endl;
+  // cout<<"real_e is"<<real_e<<endl;
+   cout<<"H2*(real_e+output_e)"<<H2*(real_e+output_e)<<endl;
+  //  cout<<"U*(real_e+output_e)"<<U*(real_e+output_e)<<endl;
+
+  
+  //    cout<<"perm1_mat_inv* perm1_mat"<<perm1_mat_inv* perm1_mat<<endl;
+  //  cout<<"perm1_mat_inv*perm2_mat_inv*perm1_mat*perm2_mat"<<perm1_mat_inv*perm2_mat_inv*perm1_mat*perm2_mat<<endl;
+  //e=perm1*perm2*e1:
+ 
+  // output_e.permute_rows(perm1,0);
+  GF2mat Ucopy=U;
+     if (Ucopy*output_e==syndrome1){cout<<"before perm:Ucopy*output_e==syndrome1 ok"<<endl;}
+   else {cout<<"error before perm:Ucopy*output_e!=syndrom1"<<endl;}
+    
+       cout<<"output_e before perm2 is"<<output_e<<endl;
+         cout<< "Ucopy before perm2 is"<<Ucopy<<endl;
+  
+        cout<<"perm2 is"<<perm2<<endl;
+       cout<<"perm2 mat is"<<perm2_mat<<endl;
+     output_e=perm2_mat*output_e;
+   
+     Ucopy=Ucopy*perm2_mat_inv;
+           cout<<"output_e after perm2 is"<<output_e<<endl;
+         cout<< "Ucopy after perm2 is"<<Ucopy<<endl;
+            if (Ucopy*output_e==syndrome1){cout<<"after perm2:Ucopy*output_e==syndrome1 ok"<<endl;}
+   else {cout<<"error after perm2:Ucopy*output_e!=syndrom1"<<endl;}
+	  
+	  
+  GF2mat T_inv=T.inverse();
+ 
+     output_e=perm1_mat*output_e;
+   
+     Ucopy=Ucopy*perm1_mat_inv;
+   if (Ucopy*output_e==syndrome1){cout<<"after perm1 TH*output_e==syndrome1 ok"<<endl;}
+   else {cout<<"error after perm1 TH*output_e!=syndrom1"<<endl;}
+   GF2mat syndrome1_pr=T_inv*syndrome1;
+      if (syndrome1_pr==syndrome){cout<<"syndrome1_pr=syndrome) ok"<<endl;}
+   else {cout<<"error syndrome1_pr!=syndrome)"<<endl;}
+  H1copy=T_inv*Ucopy;
+
+  cout<<"T_inv*Ucopy should be H"<<H1copy<<endl;
+  cout<<"H is "<<H<<endl;
+
+  // cout<<"permute reale and outpute"<<endl;
+  // U=U*perm2_mat_inv*perm1_mat_inv;
+  // cout<<"after permutation, u is"<<U<<endl;
+  // cout<<"TH is"<<T*H<<endl;
+  //   cout<<"U*(real_e+output_e)"<<U*(real_e+output_e)<<endl;
+  //     cout<<"TH*(real_e+output_e)"<<T*H*(real_e+output_e)<<endl;
+  //  cout<<"output_e after perm is"<<output_e<<endl;
+  if (H*output_e==syndrome){cout<<"suc!"<<endl;}
+  else {cout<<"error H*output_e!=syndrom"<<endl;}
+  
+
+  
+}
+*/

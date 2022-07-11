@@ -198,7 +198,7 @@ int main(int argc, char **argv){
 
   vec px(n);
   vec px_dec(n);
-  iver LR(n);
+  vec LR(n);
 
   
          
@@ -211,7 +211,7 @@ int main(int argc, char **argv){
       Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,alpha);
       if (Hx_suc==false&&(debug/8)%2==1)
 	{
-	  Hx_suc==OSD();
+	  // Hx_suc==OSD();
 	}
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
