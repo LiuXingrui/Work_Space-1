@@ -37,6 +37,7 @@ M2, M3... are some matrices from MayKay's website.
   (debug/2)%2==1 : parallel  schedule  
    (debug/4)%2==1: print messages after each iterations if reach max iterations  
    (debug/8)%2==1: use OSD after BP fails.  
+   (debug/16)%2==1: use LLR_avg.   
    0001=1: try again  
    0010=2: para  
    0011=3: try again and para  
@@ -46,6 +47,7 @@ M2, M3... are some matrices from MayKay's website.
    0111=7: print and para and try again  
    1001=9: OSD and try again  
    1011=11: para and OSD and try again  
+   11001:LLR_avg and OSD and try again.  
    channel==0: bsc, only decode z-errors(use Hx)  
    channel==1: depolarizing, pavg is the depolarizing rate  
    alpha is for testing another method.  
