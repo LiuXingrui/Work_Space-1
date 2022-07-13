@@ -140,10 +140,12 @@ void pro_dist(double pmin,double pmax, vec& pv){
 
 
 //here pavg and range are decode_p/decode_prange
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,double alpha){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int &OSD_suc,double alpha,double lambda){
   int v=H.cols();
   int c=H.rows();
   int rankH=GF2mat_rank(H);
+  vec LR_avg=LR;
+ 
   // int r2=H2.rows();
   GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
 
@@ -207,6 +209,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       mat pre_mcv=mcv;
       mat pre_mvc=mvc;
       GF2mat output_e(v,1);
+      GF2mat output_e2=output_e;
      
       
       for (int l=1;l<=lmax;l++)
@@ -220,31 +223,61 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	    {
 	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
+	  LR_avg=LR*pow(LR_avg,lambda);
+	  // LR_avg=0.9*LR_avg+LR;
+	  for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
 	  if (H*output_e==syndrome)
 	    {
 	    
 	      if(G*(output_e+real_e)==zero_rvec2)
 		{
-		  /*
-		      cout<<"suc!"<<endl;
-		         GF2mat aaaa=H*output_e+syndrome;
-		  
-			 cout<<" wt of s-s_output is"<<s_weight(aaaa)<<endl;
-			 cout<<"wt of s is"<<s_weight(syndrome)<<endl;
-		  // cout<<"suc! Error wt= "<<distance(zero_mat2, real_e, v)<<endl;
-		  */
 		  num_iter= num_iter+l;
 		  return true;
 		
-		}
-	       else
-	      	{
-	          syn_fail++;
-	      	  return false;
+		}	 
+	      else
+		{
+		  syn_fail++;
+		  return false;
 		  // er=er+ distance(output_e, real_e, n);	        
-	      	}	    	  
+		}	    	  
+	    }
+	  else if (H*output_e2==syndrome)
+	    {
+	      if(G*(output_e2+real_e)==zero_rvec2)
+		{
+		  num_iter= num_iter+l;
+		  return true;		
+		}
+	      else
+		{
+		  syn_fail++;
+		  return false;
+		  // er=er+ distance(output_e, real_e, n);	        
+		}
 	    }
 	  
+	}
+           if ((debug/8)%2==1)
+	{
+	  OSD(LR,H,syndrome,output_e,G,real_e);
+	  //	if (OSD(LR,H,syndrome,output_e,G,real_e)==true);
+	  if(G*(output_e+real_e)==zero_rvec2)
+	    {
+	      //   cout<<"OSD suc1.1"<<endl;
+	      OSD_suc++;
+	      return true;
+	    }
+	  else
+	    {
+	      OSD(LR_avg,H,syndrome,output_e2,G,real_e);
+	      if(G*(real_e+output_e2)==zero_rvec2)
+		{
+		  //  cout<<"OSD suc1.2"<<endl;
+		  OSD_suc++;
+		  return true;
+		}
+	    }	 
 	}
 
       if (debug%2==1)
@@ -269,6 +302,11 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  quan_s_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e,LR,alpha);
 		}
 	      
+	      //LR_avg=pow(LR,0.9)*pow(LR_avg,0.1);
+	      // LR_avg=0.9*LR_avg+LR;
+	        LR_avg=LR*pow(LR_avg,lambda);
+		for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
+	      
 	      if ((debug/4)%2==1)
 		{
 		  cout<<"iter l: "<<l<<endl;
@@ -285,44 +323,86 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  
 		  if(G*(output_e+real_e)==zero_rvec2)
 		    {
-		      num_iter= num_iter+l;
-		  
-			 return true;
+		      num_iter= num_iter+l;		  
+		      return true;
 		    }
 		  else
 		    {
 		      // cout<<"\n syndrome is ok, but decoding fails:"<<endl;
 		      syn_fail++;		
 		      return false;      	        
-		    }
- 	    	  
-		}	  
+		    }	    	  
+		}
+	       else if (H*output_e2==syndrome)
+		 {
+		   if(G*(output_e2+real_e)==zero_rvec2)
+		     {
+		       num_iter= num_iter+l;
+		       return true;		
+		     }
+		   else
+		    {
+		      // cout<<"\n syndrome is ok, but decoding fails:"<<endl;
+		      syn_fail++;		
+		      return false;      	        
+		    }	
+		 }
 	     
 	    }
 	}
-      GF2mat syndrome2=H*output_e+syndrome;
+      // GF2mat syndrome2=H*output_e+syndrome;
       //  cout<<" wt of s-s_output is"<<s_weight(syndrome2)<<endl;
       // cout<<"wt of s is"<<s_weight(syndrome)<<endl;
       //  cout<<"try OSD use s:"<<endl;
-      OSD(LR,H,syndrome,real_e,output_e);
-      if(G*(output_e+real_e)==zero_rvec2)
-		    {
-		      cout<<"OSD suc"<<endl;
-		  
-			 return true;
-		    }
+      if ((debug/4)%2==1)
+	{
+	  cout<<"before OSD, output_e is:\n"<<endl;
+	  err_pos2(output_e);
+	  cout<<"output_e2 is \n"<<endl;
+	  err_pos2(output_e2);
+	  cout<<"real_e is \n"<<endl;
+	  err_pos2(real_e);
+	}
+     
+      
+      if ((debug/8)%2==1)
+	{
+	  OSD(LR,H,syndrome,output_e,G,real_e);
+	  //	if (OSD(LR,H,syndrome,output_e,G,real_e)==true);
+	  if(G*(output_e+real_e)==zero_rvec2)
+	    {
+	      // cout<<"OSD suc2.1"<<endl;
+	      OSD_suc++;
+	      return true;
+	    }
+	  else
+	    {
+	      OSD(LR_avg,H,syndrome,output_e2,G,real_e);
+	      if(G*(real_e+output_e2)==zero_rvec2)
+		{
+		  // cout<<"OSD suc2.2"<<endl;
+		  OSD_suc++;
+		  return true;
+		}
+	    }	 
+	}
+      // cout<<"OSD fail"<<endl;
+      // cout<<"output_e is \n"<<endl;
+      // err_pos2(output_e);
 
-cout<<"OSD failed"<<endl;
+      //  cout<<"output_e2 is \n"<<endl;
+      //  err_pos2(output_e2);
+     
+      // cout<<"OSD failed"<<endl;
       max_fail++;
       return false;
  }
 
 
-void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,GF2mat &output_e){ //r is the rank of H
+void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const GF2mat& G,const GF2mat &real_e){ //r is the rank of H
 
   
   //get the first permutation that abs_LLR is in descending order
-  GF2mat real_e=real_e1;
   int n=LR.length();
     // cout<<"LR is \n"<<LR<<endl;
 
@@ -371,17 +451,99 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,
   GF2mat H_T=H2.get_submatrix(0,rankH,rankH-1,n-1);
   GF2mat HS_inv=H_S.inverse();
 
+  
+
   GF2mat e_S=HS_inv*syndrome2;  
   GF2mat e_T(n-rankH,1);
+  GF2mat new_e_S;
+  int wt=s_weight(e_S)+1;
+  //cout<<"original wt "<<wt<<endl;
+  int temp1;
+  int temp2=-1;
+  int temp3=-1;
+  int lambda=min(60,n-rankH);
+  
+  for (int i=0;i<n-rankH;i++)
+    {
+      //cout<<i<<": wt is "<<wt<<endl;
+      GF2mat new_e_T=e_T;
+      new_e_T.set(i,0,1);
+      new_e_S=HS_inv*e_S+HS_inv*H_T*e_T;
+      temp1=s_weight(new_e_S);
+      // cout<<"another wt "<<temp1<<endl;
+      if (temp1+1<wt)
+	{
+	  // cout<<"another e_S"<<endl;
+	  // cout<<"old wt is "<<wt<<endl;
+	  wt=temp1+1;
+	 
+	  // cout<<"new wt is "<<wt<<endl;
+	  temp2=i;
+	}
+    }
 
-  for (int i=0;i<rankH;i++){output_e.set(i,0,e_S(i,0));}
-  for (int i=rankH;i<n-1;i++){output_e.set(i,0,e_T(i-rankH,0));}
+
+  for (int i=0;i<lambda;i++)
+    {
+      for (int j=0;j<lambda;j++)
+	{
+	  GF2mat new_e_T=e_T;
+	  new_e_T.set(i,0,1);
+	  new_e_T.set(j,0,1);		  
+	  new_e_S=HS_inv*e_S+HS_inv*H_T*e_T;
+	  temp1=s_weight(new_e_S);
+      // cout<<"another wt "<<temp1<<endl;
+	  if (temp1+2<wt)
+	    {
+	      // cout<<"another e_S"<<endl;
+	      wt=temp1+2;
+	      // cout<<"new wt is "<<wt<<endl;
+
+	      temp2=i;
+	      temp3=j;
+	    }
+	}
+    }
+
+  
+      if (temp2!=-1&&temp3==-1)
+	{
+	  e_T.set(0,temp2,1);
+	  e_S=e_S+HS_inv*H_T*e_T;
+	}
+      else if (temp2!=-1&&temp3!=-1)
+	{
+	  e_T.set(0,temp2,1);
+	  e_T.set(0,temp3,1);
+	  e_S=e_S+HS_inv*H_T*e_T;
+	}
+      
+      
+      for (int i=0;i<rankH;i++){output_e.set(i,0,e_S(i,0));}
+      for (int i=rankH;i<n;i++){output_e.set(i,0,e_T(i-rankH,0));}
+
+	  
+  if (H2*output_e==syndrome2){}
+  else
+    {
+      cout<<"error H2*output_e!=syndrome2 output e is:"<<endl;
+      err_pos2(output_e);
+      cout<<"e_S is"<<endl;
+      err_pos2(e_S);
+      cout<<"e_T is"<<endl;
+      err_pos2(e_T);
+    }
  
   output_e=perm1_mat*perm2_mat*output_e;
    	  	  
 
-  if (H*output_e==syndrome){cout<<"suc!"<<endl;}
-  else {cout<<"error H*output_e!=syndrom"<<endl;}
+   if (H*output_e==syndrome){}
+   else
+     {
+       cout<<"error H*output_e!=syndrom"<<endl;
+       //cout<<"syndrome is"<<syndrome<<endl;
+       //cout<<"output_e is"<<output_e<<endl;
+     }
   
 
   
@@ -522,6 +684,29 @@ void err_pos(const nodes errors[],const GF2mat &error){
     }
  
 }
+void err_pos2(const GF2mat &error){
+  int n=error.rows();
+ 
+  
+ 
+  // ivec pos; //an empty vector,ins() works well, 
+  // int pos_size=0;
+
+
+  for (int i=0;i<n;i++)
+    {
+      if (error(i,0)==1)
+	{
+	  // pos.ins(0,i);
+	  // pos_size++;
+	  cout<<i<<"  ";
+
+	}
+     
+    }
+  cout<<"\n"<<endl;
+}
+  
   
 /*
 void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,GF2mat &output_e){ //r is the rank of H

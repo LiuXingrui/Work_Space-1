@@ -43,10 +43,11 @@ int main(int argc, char **argv){
   double pavg;
   double range;
   double alpha;
+  double lambda;
   double decode_p,decode_prange,decode_pmin,decode_pmax;
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=13){cout<<" need 10 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug channel alpha decode_p decode_prange"<<endl;return 1;}
+  if (argc!=14){cout<<" need 13 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug channel alpha decode_p decode_prange"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -126,6 +127,15 @@ int main(int argc, char **argv){
       cout<<"decode_prange should be double"<<endl;
       return 1;
     }
+
+     istringstream argv13( argv[13] );
+    if ( argv13 >> lambda){}
+  else
+    {
+      cout<<"lambda should be double"<<endl;
+      return 1;
+    }
+
   double num_iter=0.0; //for calculate average iterations for e_x
   int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
@@ -199,6 +209,7 @@ int main(int argc, char **argv){
   vec px(n);
   vec px_dec(n);
   vec LR(n);
+  int OSD_suc=0;
 
   
          
@@ -208,11 +219,8 @@ int main(int argc, char **argv){
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
    for (int s=0;s<num_of_cws;s++)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,alpha);
-      if (Hx_suc==false&&(debug/8)%2==1)
-	{
-	  // Hx_suc==OSD();
-	}
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,OSD_suc,alpha,lambda);
+  
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
@@ -238,7 +246,7 @@ int main(int argc, char **argv){
       cout<<"use OSD if failed:"<<endl;
     }
   
-
+  cout<<"lambda="<<lambda<<endl;
   cout<<"alpha="<<alpha<<endl;
   cout<<"real_ p=  ( "<<pmin<<", "<<pmax<<"),decode_p=("<<decode_pmin<<", "<<decode_pmax<<"), there are total "<< num_of_suc_dec<<" successful decoding out of "<< num_of_cws<<" cws for a [["<<n<<", "<<k<<"]] code (decode x errors only)"<<endl;
    cout<<"average iterations:"<<endl;
@@ -246,6 +254,8 @@ int main(int argc, char **argv){
    cout<<num_iter/num_of_suc_dec<<"\n\n"<<endl;
    cout<<"syn_fail="<<syn_fail<<endl;
    cout<<"max_fail="<<max_fail<<endl;
+   cout<<"OSD_suc="<<OSD_suc<<endl;
+
   
    // cout<<"num of zero errors is about "<<pow(p,n)*num_of_cws<<endl;
  
@@ -255,11 +265,11 @@ int main(int argc, char **argv){
    myfile.open (data_file,ios::app);
    if (wt==0)
      {
-       myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<pavg<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<" "<<decode_p<<"  "<<decode_prange<<endl;
+       myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<pavg<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<" "<<decode_p<<"  "<<decode_prange<<" "<<alpha<<" "<<OSD_suc<<" "<<lambda<<endl;
      }
    else
      {
-       myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<decode_p<<"  "<<decode_prange<<" "<<alpha<<endl;
+       myfile << n<<" "<<d<<"  "<< 1.0*(num_of_cws-num_of_suc_dec)/num_of_cws<<"  "<<wt<<" "<<range<<" "<<1.0*num_iter/num_of_suc_dec<<"  "<<num_of_suc_dec<<" "<<num_of_cws<<"  "<<syn_fail<<" "<<max_fail<<" "<<1.0*syn_fail/num_of_cws<<" "<<1.0*max_fail/num_of_cws<<decode_p<<"  "<<decode_prange<<" "<<alpha<<" "<<OSD_suc<<" "<<lambda<<endl;
      }
    myfile.close();
     std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
