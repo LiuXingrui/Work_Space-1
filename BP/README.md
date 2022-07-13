@@ -47,7 +47,6 @@ M2, M3... are some matrices from MayKay's website.
    0111=7: print and para and try again  
    1001=9: OSD and try again  
    1011=11: para and OSD and try again  
-   11001:LLR_avg and OSD and try again.  
    channel==0: bsc, only decode z-errors(use Hx)  
    channel==1: depolarizing, pavg is the depolarizing rate  
    alpha is for testing another method.  
