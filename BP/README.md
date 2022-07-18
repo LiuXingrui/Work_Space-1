@@ -13,7 +13,8 @@ original_BP will randomly generate some error vectors and decode them by belief 
 The executable programs cla_myparallel, cla_real_parallel, cla_sequential use different BP schedules. To run these program, use    
 
   `./new_sequential  <H_file> <data_file> <pmin> <pmax>   <number of codewords>  <max  iterations>`   
-  The data stored in data_file are n fail_rate avg_p  avg_iter number_of_suc_decoding bit_error_rate_after_decoding   
+  The data stored in data_file are 0:n 1:fail_rate 2:avg_p  3:avg_iter 4:number_of_suc_decoding 5:bit_error_rate_after_decoding
+  
  
 An example for the parity check matrix file:
   
