@@ -2,6 +2,7 @@ set format x "10^{%L}"
 set format y "10^{%L}"
 set key left
 set term png
+set terminal png size 1024,768
 set output "./forcopy/no_range_BP.png"
                     
     set log x
