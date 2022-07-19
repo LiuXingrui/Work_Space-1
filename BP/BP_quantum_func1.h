@@ -27,9 +27,9 @@ int s_weight(GF2mat &s);
 void pro_dist(double pmin,double pmax, vec& pv);
 
 //a quantum sequential update schedule: 
-void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha=1);
+void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha=1);
 
-void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat& pre_mcv,mat&pre_mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha=1);
+void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha=1);
 //decode an all-X or an all-Z error for a CSS code
 bool  quan_decode(GF2mat &H, GF2mat &H2,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int &max_fail, int &syn_fail, int debug, vec &LR,int &OSD_sec,double alpha=1,double lambda=1);
 void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const GF2mat& G,const GF2mat &real_e);

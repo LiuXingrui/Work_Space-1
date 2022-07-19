@@ -217,15 +217,15 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  //  cout<<l<<endl;
 	  if ((debug/2)%2==1)
 	    {
-	      quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
+	      quan_p_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
 	  else
 	    {
 	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
-	  LR_avg=LR*pow(LR_avg,lambda);
+	  // LR_avg=LR*pow(LR_avg,lambda);
 	  // LR_avg=0.9*LR_avg+LR;
-	  for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
+	  //  for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
 	  if (H*output_e==syndrome)
 	    {
 	    
@@ -242,6 +242,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  // er=er+ distance(output_e, real_e, n);	        
 		}	    	  
 	    }
+	  /*
 	  else if (H*output_e2==syndrome)
 	    {
 	      if(G*(output_e2+real_e)==zero_rvec2)
@@ -256,6 +257,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  // er=er+ distance(output_e, real_e, n);	        
 		}
 	    }
+	  */
 	  
 	}
            if ((debug/8)%2==1)
@@ -268,7 +270,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      OSD_suc++;
 	      return true;
 	    }
-	  else
+	  /* else
 	    {
 	      OSD(LR_avg,H,syndrome,output_e2,G,real_e);
 	      if(G*(real_e+output_e2)==zero_rvec2)
@@ -278,6 +280,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  return true;
 		}
 	    }	 
+	  */
 	}
 
       if (debug%2==1)
@@ -295,7 +298,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	   
 	      if ((debug/2)%2==1)
 		{
-		  quan_p_update(checks,errors, mcv,mvc,pre_mcv,pre_mvc,syndrome,pv2, c, v,output_e,LR,alpha);
+		  quan_p_update(checks,errors, mcv,mvc,syndrome,pv2, c, v,output_e,LR,alpha);
 		}
 	      else
 		{
@@ -304,8 +307,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      
 	      //LR_avg=pow(LR,0.9)*pow(LR_avg,0.1);
 	      // LR_avg=0.9*LR_avg+LR;
-	        LR_avg=LR*pow(LR_avg,lambda);
-		for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
+	      //  LR_avg=LR*pow(LR_avg,lambda);
+	      //	for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
 	      
 	      if ((debug/4)%2==1)
 		{
@@ -333,6 +336,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		      return false;      	        
 		    }	    	  
 		}
+	      /*
 	       else if (H*output_e2==syndrome)
 		 {
 		   if(G*(output_e2+real_e)==zero_rvec2)
@@ -347,7 +351,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		      return false;      	        
 		    }	
 		 }
-	     
+	      */
 	    }
 	}
       // GF2mat syndrome2=H*output_e+syndrome;
@@ -375,6 +379,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      OSD_suc++;
 	      return true;
 	    }
+	  /*
 	  else
 	    {
 	      OSD(LR_avg,H,syndrome,output_e2,G,real_e);
@@ -384,7 +389,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  OSD_suc++;
 		  return true;
 		}
-	    }	 
+	    }
+	  */	 
 	}
       // cout<<"OSD fail"<<endl;
       // cout<<"output_e is \n"<<endl;
@@ -564,7 +570,7 @@ GF2mat col_permutation_matrix(ivec & perm)
 
 
 
-void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
+void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
   
     double ipr;
 
@@ -599,41 +605,38 @@ void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,c
     }  
 }
 
-void quan_p_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,mat &pre_mcv,mat& pre_mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
+void quan_s_update(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc,const GF2mat& syndrome,const vec &pv,int c, int v,  GF2mat& output_e, vec &LR,double alpha){
   
     double ipr;
+    double final_pr;
 
-  for (int i=0;i<c;i++)
-    {
-      int ci_degree=checks[i].degree;
-      
-      	//update all v-to-ci massages first:
-    for (int j=0;j<ci_degree;j++)
-      {            
-	int vnode=(checks[i].neighbors)(j);
-        ipr=(1-pv[vnode])/pv[vnode];
-	update_vj_to_ci(checks, errors,pre_mcv, mvc,vnode,i, ipr,alpha);	
-      }
-    }
-    //update c-to-vj massages:
-  for (int j=0;j<v;j++)
-    {
-   int vj_degree=errors[j].degree;
-   double  final_pr=(1-pv[j])/pv[j];
+   for (int j=0;j<v;j++)
+      {
+	 int vj_degree=errors[j].degree;
+	 ipr=(1-pv[j])/pv[j];
+	 final_pr=ipr;
 
-   for (int i=0;i<vj_degree;i++)
-     {
-       int cnode=(errors[j].neighbors)(i);
-       update_ci_to_vj( checks, errors,mcv, pre_mvc,cnode,j,syndrome(cnode,0));
+	 //ci is the ith neibor of vj:
+	 for (int i=0;i<vj_degree;i++)
+	   {
+	     //  update the  v_j to c_i massage:      
+	     int ci=(errors[j].neighbors)(i);
+	     update_vj_to_ci(checks, errors,mcv, mvc,j,ci, ipr);          
+	   }
+	 
+	 for (int i=0;i<vj_degree;i++)
+	   {     
+	     int ci=(errors[j].neighbors)(i);
+	     update_ci_to_vj( checks, errors,mcv, mvc,ci,j,syndrome(ci,0));	   // update all  c_i to v_j massages         
+	     final_pr=final_pr*mcv(ci,j);      
+	   } 
+	 //  cout<<j<<"   "<<final_pr<<endl;
+	 LR(j)=final_pr;
+	 output_e.set(j,0,final_pr<1? 1:0);      
+      }  
+    
 
-       final_pr=final_pr*pow(mcv(cnode,j),1/alpha);
-      }   
-       //  cout<<j<<"   "<<final_pr<<endl;
-    LR(j)=final_pr;
-    output_e.set(j,0,final_pr<1? 1:0);   
-    }
-  pre_mcv=mcv;
-  pre_mvc=mvc;
+
 }
 
 
