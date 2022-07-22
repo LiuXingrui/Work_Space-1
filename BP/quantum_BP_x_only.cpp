@@ -170,9 +170,19 @@ int main(int argc, char **argv){
      {
        wt=0;// for p_min, pmax decode
      }
+   if (range<1)
+     {
   pmin=1.0*pavg*(1-range);
+     }
+   else {pmin=0;}
+   
   pmax=1.0*pavg*(1+range);
+  if (decode_prange<1)
+    {
   decode_pmin=1.0*decode_p*(1-decode_prange);
+    }
+
+  else{decode_prange=0;}
   decode_pmax=1.0*decode_p*(1+decode_prange);
   r=r1+r2;
   int rankx=GF2mat_rank(Hx);

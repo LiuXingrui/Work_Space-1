@@ -414,12 +414,12 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 
   int r=H.rows();
   int k=n-r;
-  vec nega_abs_LLR(n); //the sort function gives a ascending  order, we need descending order
+  vec LLR(n); //the sort function gives a ascending  order, we need descending order
   for (int i=0;i<n;i++)
     {
       if (LR(i)>=0) 
 	{
-	  nega_abs_LLR(i)=-abs(log(LR(i)));
+	  LLR(i)=log(LR(i));
 	}
       else
 	{
@@ -428,7 +428,7 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 	}
     }
   //now we have H*perm1*perm1_inv*e=s, and def:H1=H*perm1
-  ivec perm1=sort_index(nega_abs_LLR);
+  ivec perm1=sort_index(LLR);
   
   GF2mat H1=H;
   H1.permute_cols(perm1,0);
