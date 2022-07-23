@@ -18,7 +18,7 @@ using namespace std;
 using namespace itpp;
 
 // a "bsc" channel that different qubit has different error probablity
-void error_channel(GF2mat &cw, const vec &p);
+int error_channel(GF2mat &cw, const vec &p);
 void error_channel2(GF2mat &error, int wt);
 void depolarizing(GF2mat &xerror,GF2mat &zerror, const vec &p);
 int weight(GF2mat &cw);

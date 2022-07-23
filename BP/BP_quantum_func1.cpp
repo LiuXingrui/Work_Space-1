@@ -25,11 +25,12 @@ using namespace std;
 #include <itpp/itcomm.h>
 using namespace itpp;
 
-void error_channel(GF2mat &cw, const vec &p){
+int error_channel(GF2mat &cw, const vec &p){
  
   double temp2;
   bin one=1;
-  if (cw.cols()!=p.size())
+  int temp=0;
+  if (cw.rows()!=p.size())
     {cout<<"the size of p and cw do not match"<<endl;}
 
   else
@@ -39,7 +40,8 @@ void error_channel(GF2mat &cw, const vec &p){
 	temp2=randu();
 	if(temp2<p[i])
 	  {
-	    cw.set(0,i,cw(0,i)+one);
+	    cw.set(i,0,cw(0,i)+one);
+	    temp++;
 	  }	
       }
   }
@@ -57,9 +59,9 @@ void error_channel2(GF2mat &error, int wt){
     for (int i=0;i<wt;i++)
       {    
 	temp2=randi(0,n-1);
-	error.set(0,temp2,one);	      
+	error.set(temp2,0,one);	      
   }
-    if(weight(error)!=wt)
+    if(s_weight(error)!=wt)
       
       { GF2mat error2(1,n);
 	error=error2;
@@ -141,45 +143,57 @@ void pro_dist(double pmin,double pmax, vec& pv){
 
 //here pavg and range are decode_p/decode_prange
 bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int &OSD_suc,double alpha,double lambda){
+
+
+  int wt_real_e;
   int v=H.cols();
-  int c=H.rows();
-  int rankH=GF2mat_rank(H);
-  vec LR_avg=LR;
- 
   // int r2=H2.rows();
-  GF2mat real_eT(1,v);    //the transposed error vector, which is a row vector.
+  GF2mat real_e(v,1); 
 
   if (wt==0)
 
     {
-  error_channel(real_eT, pv);
+   wt_real_e=error_channel(real_e, pv);
     }
   else
     {
-      error_channel2(real_eT,wt);
+      error_channel2(real_e,wt);
     }
 
   // cout<<pv<<endl;
 
   //if no error, break
-  GF2mat zero_rvec(1,v);
+
  
-  if (real_eT==zero_rvec)
+  if (wt_real_e==0)
     {
 	 
       return true;
     }
- 
+
+  double pmin;
+  double pmax;
+  if (range>1)
+    {
+      pmin=0;
+	}
+  else{
+    pmin=pavg*(1-range);
+  }
+
+  pmax=pavg*(1+range);
+    
+    GF2mat zero_rvec(1,v);
+   
+  int c=H.rows();
+   int rankH=GF2mat_rank(H);
+  vec LR_avg=LR;
   GF2mat zero_mat1(c,1);
   GF2mat zero_mat2(v,1);
   GF2mat zero_rvec2(v-rankH,1);
-  GF2mat real_e(v,1);  //the error vector which is a column vector,
 
-  
-  for (int q=0;q<v;q++)
-    {
-      real_e.set(q,0,real_eT(0,q));
-    }
+
+
   
   GF2mat syndrome=H*real_e;
 
@@ -206,10 +220,10 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       mvc.zeros();
     
       initialize_massages( mcv,mvc, H); //initialize to all-1 matrix
-      mat pre_mcv=mcv;
-      mat pre_mvc=mvc;
+      // mat pre_mcv=mcv;
+      // mat pre_mvc=mvc;
       GF2mat output_e(v,1);
-      GF2mat output_e2=output_e;
+      // GF2mat output_e2=output_e;
      
       
       for (int l=1;l<=lmax;l++)
@@ -289,10 +303,10 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  mcv.zeros();
 	  mvc.zeros();
 	  initialize_massages( mcv,mvc, H);
-	  pre_mcv=mcv;
-	  pre_mvc=mvc;
+	  //  pre_mcv=mcv;
+	  //  pre_mvc=mvc;
 	  vec pv2(v);
-	  pro_dist(pavg*(1-range),pavg*(1+range),pv2);
+	  pro_dist(pmin,pmax,pv2);
 	  for (int l=1;l<=lmax;l++)
 	    {
 	   
@@ -362,8 +376,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	{
 	  cout<<"before OSD, output_e is:\n"<<endl;
 	  err_pos2(output_e);
-	  cout<<"output_e2 is \n"<<endl;
-	  err_pos2(output_e2);
+	  // cout<<"output_e2 is \n"<<endl;
+	  // err_pos2(output_e2);
 	  cout<<"real_e is \n"<<endl;
 	  err_pos2(real_e);
 	}
