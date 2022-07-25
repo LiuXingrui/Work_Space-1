@@ -26,26 +26,31 @@ using namespace std;
 using namespace itpp;
 
 int error_channel(GF2mat &cw, const vec &p){
- 
+
   double temp2;
   bin one=1;
   int temp=0;
+  int r=cw.rows();
   if (cw.rows()!=p.size())
-    {cout<<"the size of p and cw do not match"<<endl;}
+    {
+      cout<<"the size of p and cw do not match"<<endl;
+    }
 
   else
     {
-    for (int i=0;i<cw.cols();i++)
-      {    
+    for (int i=0;i<r;i++)
+      {
+
 	temp2=randu();
 	if(temp2<p[i])
 	  {
-	    cw.set(i,0,cw(0,i)+one);
+	 
+	    cw.set(i,0,cw(i,0)+one);
 	    temp++;
 	  }	
       }
-  }
-  
+    }
+  return temp;
 }
 
 
@@ -142,10 +147,10 @@ void pro_dist(double pmin,double pmax, vec& pv){
 
 
 //here pavg and range are decode_p/decode_prange
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int &OSD_suc,double alpha,double lambda){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int rankH,int &OSD_suc,double alpha,double lambda){
 
-
-  int wt_real_e;
+ 
+  int wt_real_e=0;
   int v=H.cols();
   // int r2=H2.rows();
   GF2mat real_e(v,1); 
@@ -153,7 +158,10 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
   if (wt==0)
 
     {
+
+
    wt_real_e=error_channel(real_e, pv);
+ 
     }
   else
     {
@@ -176,21 +184,22 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
   if (range>1)
     {
       pmin=0;
-	}
-  else{
+    }
+  else
+    {
     pmin=pavg*(1-range);
-  }
+    }
 
   pmax=pavg*(1+range);
     
     GF2mat zero_rvec(1,v);
    
   int c=H.rows();
-   int rankH=GF2mat_rank(H);
+  LR.zeros();
   vec LR_avg=LR;
-  GF2mat zero_mat1(c,1);
+  GF2mat zero_mat1(c,1);//
   GF2mat zero_mat2(v,1);
-  GF2mat zero_rvec2(v-rankH,1);
+  GF2mat zero_rvec2(v-rankH,1); //
 
 
 
@@ -237,6 +246,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	    {
 	      quan_s_update(checks,errors, mcv,mvc,syndrome,pv_dec, c, v,output_e,LR,alpha);
 	    }
+	  //cout<<"l="<<l<<endl;
+	  // cout<<"LR="<<LR<<endl;
 	  // LR_avg=LR*pow(LR_avg,lambda);
 	  // LR_avg=0.9*LR_avg+LR;
 	  //  for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
@@ -276,6 +287,8 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	}
            if ((debug/8)%2==1)
 	{
+	  //cout<<"LR="<<LR<<endl;
+	  //cout<<"mcv="<<mcv<<endl;
 	  OSD(LR,H,syndrome,output_e,G,real_e);
 	  //	if (OSD(LR,H,syndrome,output_e,G,real_e)==true);
 	  if(G*(output_e+real_e)==zero_rvec2)
@@ -439,6 +452,7 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 	{
 
 	  cout<<"something goes wrong in the OSD func"<<endl;
+	  cout<<LR(i)<<endl;
 	}
     }
   //now we have H*perm1*perm1_inv*e=s, and def:H1=H*perm1

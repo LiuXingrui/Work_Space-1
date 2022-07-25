@@ -73,10 +73,10 @@ void initialize_massages(mat &mcv,mat& mvc,const GF2mat &H){
       {
       for (int j=0;j<c;j++)
 	{
-	  if (H(i,j)==1){
+	    if (H(i,j)==1){
 	    mcv(i,j)=1;
 	    mvc(i,j)=1;	 
-	  }
+	     }
 	}	     
     }  
 }
