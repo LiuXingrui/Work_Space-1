@@ -30,7 +30,7 @@ int main(int argc, char **argv){
   GlobalRNG_randomize ();
   double pmax;
   double pmin;
-  int num_of_cws;
+  int num_of_cws=0;
   string file_name;
   string file_name2;
   string data_file;
@@ -44,10 +44,12 @@ int main(int argc, char **argv){
   double range;
   double alpha;
   double lambda;
+  int num_of_failed_cws=0;
+  int max_failed_cws;
   double decode_p,decode_prange,decode_pmin,decode_pmax;
   //can input pmin and pmax, or the weight of error_vectors and dec_method, which is same_p or diff_p: 
   //diff p decode: pmin=wt/n*0.5, pmax=wt/n*1.5,   same p decode: p=wt/n
-  if (argc!=14){cout<<" need 13 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  num_of_cws lmax data_file debug channel alpha decode_p decode_prange"<<endl;return 1;}
+  if (argc!=14){cout<<" need 13 parameters: ./qBPx  Hx_file Hz_file pavg/wt range  max_failed_cws lmax data_file debug channel alpha decode_p decode_prange"<<endl;return 1;}
   //get the parameters: 
    
   file_name=argv[1];
@@ -72,10 +74,10 @@ int main(int argc, char **argv){
  
 	     
   istringstream argv5( argv[5] );
-  if ( argv5 >> num_of_cws){}
+  if ( argv5 >> max_failed_cws){}
   else
     {
-      cout<<"num_of_cws should be an int"<<endl;
+      cout<<"max_failed_cws should be an int"<<endl;
       return 1;
     }
 	        
@@ -227,14 +229,21 @@ int main(int argc, char **argv){
   pro_dist( decode_pmin,decode_pmax, px_dec);  
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
-   for (int s=0;s<num_of_cws;s++)
+  while (  num_of_failed_cws<max_failed_cws)
     {
-      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,OSD_suc,alpha,lambda);
-  
+      num_of_cws++;
+      Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,rankx,OSD_suc,alpha,lambda);
+ 
       // cout<<num_iter<<endl;
       if (Hx_suc==true)
 	{       	 
 	  num_of_suc_dec++;
+	}
+      else
+	{
+	    num_of_failed_cws++;
+
+
 	}
     
     }
