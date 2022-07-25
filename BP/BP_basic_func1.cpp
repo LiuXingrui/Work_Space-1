@@ -5,6 +5,8 @@
 #include <fstream>
 #include <math.h> 
 #include <random>
+#include <chrono>
+#include <thread>
 
 #ifndef basic
 #define basic
@@ -198,9 +200,26 @@ void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
       if (vk!=j)
 	{
 	  temp=temp*(mvc(i,vk)-1)/(mvc(i,vk)+1);
+
+	  
 	}
-     }   
+     }
+   	  if (temp==1)
+	    {
+	      temp=1-1e-10;
+	    }
      mcv.set(i,j,s==0? (1+temp)/(1-temp):(1-temp)/(1+temp));
+     /*
+     if (isinf(mcv(i,j)))
+       {
+	   std::cout << "Hello waiter" << std::endl;
+    std::chrono::seconds dura( 5);
+    std::this_thread::sleep_for( dura );
+    std::cout << "Waited 5s\n";
+	 cout<<"get a mcv inf"<<endl;
+	 cout<<"temp is "<<temp<<endl;
+       }
+     */
 }
 
 //update vj to ci massage:
@@ -220,6 +239,18 @@ void update_vj_to_ci(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
 	{
 	   mvc.set(i,j,mvc(i,j)*pow(mcv(ck,j),1.0-1.0/alpha));
 	}
+
+      /*
+      if (isinf(mvc(i,j)))
+	{
+	    std::cout << "Hello waiter" << std::endl;
+    std::chrono::seconds dura( 5);
+    std::this_thread::sleep_for( dura );
+    std::cout << "Waited 5s\n";
+	  cout<<"mvc inf,mcv is"<<mcv(ck,j)<<endl;
+
+	}
+      */
      }   
 }
 
