@@ -148,7 +148,7 @@ void pro_dist(double pmin,double pmax, vec& pv){
 
 
 //here pavg and range are decode_p/decode_prange
-bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int rankH,int &OSD_suc,double alpha,double lambda){
+bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[],const vec &pv,const vec&pv_dec,double pavg,double range,double& num_iter, int lmax,int &wt,int& max_fail, int&syn_fail,  int debug, vec &LR,int rankH,int &OSD_suc,double alpha,double lambda){
 
  
   int wt_real_e=0;
@@ -324,19 +324,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  */
 
 	  
-	  else
-	    {
-	        if ((debug/4)%2==1)
-		  {
-		    cout<<"OSD fails the first time:"<<endl;
-		    cout<<"output_e is:\n"<<endl;
-		    err_pos(errors,output_e);
-		    // cout<<"output_e2 is \n"<<endl;
-		    // err_pos2(output_e2);
-		    cout<<"real_e is \n"<<endl;
-		    err_pos(errors,real_e);
-		  }
-	    }
+	
 	  
 	}
  
@@ -417,6 +405,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       //  cout<<" wt of s-s_output is"<<s_weight(syndrome2)<<endl;
       // cout<<"wt of s is"<<s_weight(syndrome)<<endl;
       //  cout<<"try OSD use s:"<<endl;
+      /*
       if ((debug/4)%2==1)
 	{
 	  cout<<"BP fails the second time:"<<endl;
@@ -424,10 +413,11 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	  err_pos(errors,output_e);
 	  // cout<<"output_e2 is \n"<<endl;
 	  // err_pos2(output_e2);
+	  cout<<"real e wt="<<s_weight(real_e)<<endl;
 	  cout<<"real_e is \n"<<endl;
 	  err_pos(errors,real_e);
 	}
-     
+      */
       
       if ((debug/8)%2==1)
 	{
@@ -439,19 +429,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      OSD_suc++;
 	      return true;
 	    }
-	    else
-	    {
-	        if ((debug/4)%2==1)
-		  {
-		    cout<<"OSD fails the first time:"<<endl;
-		    cout<<"output_e is:\n"<<endl;
-		    err_pos(errors,output_e);
-		    // cout<<"output_e2 is \n"<<endl;
-		    // err_pos2(output_e2);
-		    cout<<"real_e is \n"<<endl;
-		    err_pos(errors,real_e);
-		  }
-	    }
+	 
 	  /*
 	  else
 	    {
@@ -473,6 +451,18 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       //  err_pos2(output_e2);
      
       // cout<<"OSD failed"<<endl;
+       if ((debug/4)%2==1)
+		  {
+		    cout<<"failed"<<endl;
+		    	  cout<<"output e wt="<<s_weight(output_e)<<endl;
+		    cout<<"output_e is:\n"<<endl;
+		    err_pos(errors,output_e);
+		    // cout<<"output_e2 is \n"<<endl;
+		    // err_pos2(output_e2);
+		    	  cout<<"real e wt="<<s_weight(real_e)<<endl;
+		    cout<<"real_e is \n"<<endl;
+		    err_pos(errors,real_e);
+		  }
       max_fail++;
       return false;
  }
@@ -590,12 +580,14 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 	{
 	  e_T.set(0,temp2,1);
 	  e_S=e_S+HS_inv*H_T*e_T;
+	  cout<<1<<endl;
 	}
       else if (temp2!=-1&&temp3!=-1)
 	{
 	  e_T.set(0,temp2,1);
 	  e_T.set(0,temp3,1);
 	  e_S=e_S+HS_inv*H_T*e_T;
+	  cout<<2<<endl;
 	}
       
       
