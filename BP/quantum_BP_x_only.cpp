@@ -31,6 +31,7 @@ int main(int argc, char **argv){
   double pmax;
   double pmin;
   int num_of_cws=0;
+  int max_num_of_cws=1e14;
   string file_name;
   string file_name2;
   string data_file;
@@ -80,7 +81,13 @@ int main(int argc, char **argv){
       cout<<"max_failed_cws should be an int"<<endl;
       return 1;
     }
-	        
+
+  //cout<<max_failed_cws<<endl;
+  if (max_failed_cws<0)
+    {
+      max_num_of_cws=-max_failed_cws;
+      max_failed_cws=100000;
+    }
  
 
   istringstream argv6( argv[6] );
@@ -229,8 +236,10 @@ int main(int argc, char **argv){
   pro_dist( decode_pmin,decode_pmax, px_dec);  
   
   // int er=0;  //er is the number of one-bit errors (x for 1, z for 1, y for 2) that are wrong after decoding 
-  while (  num_of_failed_cws<max_failed_cws)
+  while (  num_of_failed_cws<max_failed_cws&&num_of_cws<max_num_of_cws)
     {
+      //cout<<num_of_cws<<endl;
+      //cout<<max_num_of_cws<<endl;
       num_of_cws++;
       Hx_suc= quan_decode(Hx,Gz, xchecks,zerrors,px,px_dec,decode_p,decode_prange,num_iter,lmax,wt,max_fail,syn_fail,debug,LR,rankx,OSD_suc,alpha,lambda);
  

@@ -58,21 +58,22 @@ void error_channel2(GF2mat &error, int wt){
  
   double temp2;
   bin one=1;
-  int n=error.cols();
-  
+  int n=error.rows();
+  //cout<<1<<endl;
 
     for (int i=0;i<wt;i++)
       {    
 	temp2=randi(0,n-1);
 	error.set(temp2,0,one);	      
   }
-    if(s_weight(error)!=wt)
+    if (s_weight(error)!=wt)
       
-      { GF2mat error2(1,n);
+      { GF2mat error2(n,1);
 	error=error2;
 	//cout<<"!=wt, try again"<<endl;
 	error_channel2(error,wt);
       }
+    //cout<<2<<endl;
 }
 
 void depolarizing(GF2mat &xerror,GF2mat &zerror, const vec &p){
@@ -161,6 +162,12 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 
 
    wt_real_e=error_channel(real_e, pv);
+     if (wt_real_e==0)
+    {
+	 
+      return true;
+    }
+
  
     }
   else
@@ -173,11 +180,6 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
   //if no error, break
 
  
-  if (wt_real_e==0)
-    {
-	 
-      return true;
-    }
 
   double pmin;
   double pmax;
@@ -268,6 +270,18 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		}	    	  
 	    }
 	  /*
+	     if ((debug/4)%2==1)
+	{
+	  cout<<"BP fails for the first time, before OSD:"<<endl;
+	  cout<<"output_e is:\n"<<endl;
+	  err_pos(errors,output_e);
+	  // cout<<"output_e2 is \n"<<endl;
+	  // err_pos2(output_e2);
+	  cout<<"real_e is \n"<<endl;
+	  err_pos(errors,real_e);
+	}
+	  */
+	  /*
 	  else if (H*output_e2==syndrome)
 	    {
 	      if(G*(output_e2+real_e)==zero_rvec2)
@@ -308,8 +322,25 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		}
 	    }	 
 	  */
-	}
 
+	  
+	  else
+	    {
+	        if ((debug/4)%2==1)
+		  {
+		    cout<<"OSD fails the first time:"<<endl;
+		    cout<<"output_e is:\n"<<endl;
+		    err_pos(errors,output_e);
+		    // cout<<"output_e2 is \n"<<endl;
+		    // err_pos2(output_e2);
+		    cout<<"real_e is \n"<<endl;
+		    err_pos(errors,real_e);
+		  }
+	    }
+	  
+	}
+ 
+     
       if (debug%2==1)
 	{
 	  
@@ -336,7 +367,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      // LR_avg=0.9*LR_avg+LR;
 	      //  LR_avg=LR*pow(LR_avg,lambda);
 	      //	for (int i=0;i<v;i++) {output_e2.set(i,0,LR_avg(i)<1? 1:0);}
-	      
+	      /*
 	      if ((debug/4)%2==1)
 		{
 		  cout<<"iter l: "<<l<<endl;
@@ -347,6 +378,7 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 		  cout<<"\nmcv:\n"<<mcv<<"\n mvc \n"<<mvc<<endl;
 		  //cout<<"\npremcv:\n"<<pre_mcv<<"\n premvc \n"<<pre_mvc<<endl;
 		}
+	      */
 	      
 	      if (H*output_e==syndrome)
 		{
@@ -387,12 +419,13 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       //  cout<<"try OSD use s:"<<endl;
       if ((debug/4)%2==1)
 	{
-	  cout<<"before OSD, output_e is:\n"<<endl;
-	  err_pos2(output_e);
+	  cout<<"BP fails the second time:"<<endl;
+	  cout<<"output_e is:\n"<<endl;
+	  err_pos(errors,output_e);
 	  // cout<<"output_e2 is \n"<<endl;
 	  // err_pos2(output_e2);
 	  cout<<"real_e is \n"<<endl;
-	  err_pos2(real_e);
+	  err_pos(errors,real_e);
 	}
      
       
@@ -405,6 +438,19 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
 	      // cout<<"OSD suc2.1"<<endl;
 	      OSD_suc++;
 	      return true;
+	    }
+	    else
+	    {
+	        if ((debug/4)%2==1)
+		  {
+		    cout<<"OSD fails the first time:"<<endl;
+		    cout<<"output_e is:\n"<<endl;
+		    err_pos(errors,output_e);
+		    // cout<<"output_e2 is \n"<<endl;
+		    // err_pos2(output_e2);
+		    cout<<"real_e is \n"<<endl;
+		    err_pos(errors,real_e);
+		  }
 	    }
 	  /*
 	  else
