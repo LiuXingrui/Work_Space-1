@@ -33,7 +33,8 @@ M2, M3... are some matrices from MayKay's website.
   
   
   qBP will decode CSS code with error probability distributed between pmin and pmax:  
-  `./qBP <Hx_file> <Hz_file>  <pavg/wt> <range> <max number of failed decoding><lmax> <data_file><debug><channel><alpha><decode_p><decode_prange><lambda>`    
+  `./qBP <Hx_file> <Hz_file>  <pavg/wt> <range> <max number of failed decoding/num_of_cws><lmax> <data_file><debug><channel><alpha><decode_p><decode_prange><lambda>`    
+  if <max number of failed decoding/num_of_cws> is less than 0, then that is num_of_cws.
   debug%2==1 : if reach maximum iteratios, try another p_dis, decode it again.  
   (debug/2)%2==1 : parallel  schedule  
    (debug/4)%2==1: print messages after each iterations if reach max iterations  
