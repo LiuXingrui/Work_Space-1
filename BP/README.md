@@ -5,8 +5,8 @@ instead of
 ``` `pkg-config --cflags itpp` ``` and   
 ``` `pkg-config --libs itpp` ```   
 
-original_BP will randomly generate some error vectors and decode them by belief propagation.    
 
+Classical:  
 The executable programs cla_myparallel, cla_real_parallel, cla_sequential....(Some of them are old editions, it is better recompile before running) use different BP schedules. To run these program, use    
 
   `./new_sequential  <H_file> <data_file> <pmin> <pmax>   <number of codewords>  <max  iterations>`   
@@ -28,7 +28,7 @@ M2, M3... are some matrices from MayKay's website.
   gen_HPC.cpp will generate Hx and Hz for hypergraph product code.    
   `./HPC <file stored H1> <file stored H2> <file stored Hx> <file stored Hz>`
   
-  
+  quantum:  
   xqBP will decode CSS code with error probability distributed between pmin and pmax:  
   `./xqBP <Hx_file> <Hz_file>  <pavg/wt> <range> <max number of failed decoding/num_of_cws><lmax> <data_file><debug><channel><alpha><decode_p><decode_prange><lambda>`    
   if <max number of failed decoding/num_of_cws> is less than 0, then that is num_of_cws. If it is greater than 0, that is this max_num_of_failed_decodings, when the program produces such number of failed decodings, it stopped.  
