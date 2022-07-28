@@ -261,11 +261,11 @@ int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes err
  
   //if no error, break
  
-  
-  GF2mat real_eT(1,v);    
-  error_channel(real_eT, pv);
-  GF2mat zero_vec(1,v);
-  if (real_eT==zero_vec)
+  int wt=0;
+  GF2mat real_e(v,1);    
+  wt=error_channel(real_e, pv);
+  //GF2mat zero_vec(v,1);
+  if (wt==0)
     {
       // cout<<"suc, no error"<<endl;
       return 1;
@@ -273,20 +273,16 @@ int  cla_decode(int v,int c,const GF2mat &H,const nodes checks[],const nodes err
   
   GF2mat zero_mat1(c,1);
   GF2mat zero_mat2(v,1);
-  GF2mat real_e(v,1);  //the error vector which is a column vector,
 
      
-  for (int q=0;q<v;q++)
-    {
-      real_e.set(q,0,real_eT(0,q));
-    }
+
   GF2mat syndrome=H*real_e;
 
   //is the syndrome a zero vector?
   if (syndrome==zero_mat1)
 	{
 	  //cout<<"failure! error= some codeword"<<endl;	    
-	  er=er+ distance(zero_mat2, real_e, n);
+	  er=er+ distance(zero_mat2, real_e, n); // for calculating bit error rate after decoding
 	  return 0;	 
 		   
 	}

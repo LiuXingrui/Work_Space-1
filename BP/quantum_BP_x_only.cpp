@@ -31,14 +31,14 @@ int main(int argc, char **argv){
   double pmax;
   double pmin;
   int num_of_cws=0;
-  int max_num_of_cws=1e14;
+  int max_num_of_cws=1e10;
   string file_name;
   string file_name2;
   string data_file;
   int lmax;
   int wt;
   int channel;
-  int num_dec;
+
   int d=-1;
   int debug=0;
   double pavg;
@@ -86,7 +86,7 @@ int main(int argc, char **argv){
   if (max_failed_cws<0)
     {
       max_num_of_cws=-max_failed_cws;
-      max_failed_cws=100000;
+      max_failed_cws=1000000;
     }
  
 
@@ -146,7 +146,7 @@ int main(int argc, char **argv){
     }
 
   double num_iter=0.0; //for calculate average iterations for e_x
-  int num_of_suc_dec=0;// number of successfully decoded results
+  //int num_of_suc_dec=0;// number of successfully decoded results
   int num_of_x_suc_dec=0;//number of Hx successfully decoded results
   int max_fail=0;//number of fails that reach maximum iterations
   int syn_fail=0;//number of fails that get the right syndrome but fails
@@ -162,7 +162,8 @@ int main(int argc, char **argv){
   
   GF2mat Hx=read_matrix( n1,r1, file_name);
   GF2mat Hz=read_matrix( n2,r2, file_name2);
- 
+  //Hx=Hx.get_submatrix(0,0,r1-1,n1-1);
+  //Hz=Hz.get_submatrix(0,0,r2-1,n2-1);
   //are the parity check matrices right?
   if (n1!=n2){cout<<"nx!=nz, the two matrices donot match"<<endl;return 1;}  
   n=n1;
