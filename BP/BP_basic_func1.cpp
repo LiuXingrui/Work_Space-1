@@ -207,6 +207,7 @@ void update_ci_to_vj(const nodes checks[],const nodes errors[],mat &mcv,mat& mvc
    	  if (temp==1)
 	    {
 	      temp=1-1e-10;
+	      cout<<"reset temp"<<endl;
 	    }
      mcv.set(i,j,s==0? (1+temp)/(1-temp):(1-temp)/(1+temp));
      /*

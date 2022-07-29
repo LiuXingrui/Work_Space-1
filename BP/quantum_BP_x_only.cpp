@@ -31,7 +31,7 @@ int main(int argc, char **argv){
   double pmax;
   double pmin;
   int num_of_cws=0;
-  int max_num_of_cws=1e10;
+  int max_num_of_cws=2147483647;
   string file_name;
   string file_name2;
   string data_file;
@@ -146,13 +146,13 @@ int main(int argc, char **argv){
     }
 
   double num_iter=0.0; //for calculate average iterations for e_x
-  //int num_of_suc_dec=0;// number of successfully decoded results
-  int num_of_x_suc_dec=0;//number of Hx successfully decoded results
+  int num_of_suc_dec=0;// number of successfully decoded results
+  // int num_of_x_suc_dec=0;//number of Hx successfully decoded results
   int max_fail=0;//number of fails that reach maximum iterations
   int syn_fail=0;//number of fails that get the right syndrome but fails
   
   bool Hx_suc=false;
-  bool Hz_suc=false;
+  // bool Hz_suc=false;
 
 
 
@@ -230,7 +230,7 @@ int main(int argc, char **argv){
   vec px_dec(n);
   vec LR(n);
   int OSD_suc=0;
-
+  // int  num_of_suc_dec=0;
   
          
   pro_dist( pmin,pmax, px);
