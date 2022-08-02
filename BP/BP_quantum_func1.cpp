@@ -453,15 +453,21 @@ bool  quan_decode(GF2mat &H, GF2mat &G,const nodes checks[],const nodes errors[]
       // cout<<"OSD failed"<<endl;
        if ((debug/4)%2==1)
 		  {
-		    cout<<"failed"<<endl;
-		    	  cout<<"output e wt="<<s_weight(output_e)<<endl;
-		    cout<<"output_e is:\n"<<endl;
-		    err_pos(errors,output_e);
+		    //cout<<"failed"<<endl;
+		    //cout<<"output e wt="<<s_weight(output_e)<<endl;
+		    // cout<<"show the position of errors: only for checkerboard codes"<<endl;
+		    cout<<"output e is:\n"<<endl;
+		    err_pos2(output_e);
 		    // cout<<"output_e2 is \n"<<endl;
 		    // err_pos2(output_e2);
-		    	  cout<<"real e wt="<<s_weight(real_e)<<endl;
-		    cout<<"real_e is \n"<<endl;
-		    err_pos(errors,real_e);
+		    //cout<<"real e wt="<<s_weight(real_e)<<endl;
+		    cout<<"real e is \n"<<endl;
+		 
+		    err_pos2(real_e);
+		    GF2mat sume=real_e+output_e;
+		    //cout<<"output_e+real_e wt="<<s_weight(sume)<<endl;
+		    cout<<"residual e is \n"<<endl;
+		    err_pos2(sume);
 		  }
       max_fail++;
       return false;
@@ -477,7 +483,7 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 
   int r=H.rows();
   int k=n-r;
-  vec LLR(n); //the sort function gives a ascending  order, we need descending order
+  vec LLR(n); //the sort function gives a ascending  order, LR=p0/p1
   for (int i=0;i<n;i++)
     {
       if (LR(i)>=0) 
@@ -487,12 +493,13 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
       else
 	{
 
-	  cout<<"something goes wrong in the OSD func"<<endl;
+	  cout<<"negative LR!"<<endl;
 	  cout<<LR(i)<<endl;
 	}
     }
   //now we have H*perm1*perm1_inv*e=s, and def:H1=H*perm1
   ivec perm1=sort_index(LLR);
+  //for (int i=0;i<n;i++){perm1(i)=i;}
   
   GF2mat H1=H;
   H1.permute_cols(perm1,0);
@@ -580,14 +587,14 @@ void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome, GF2mat &output_e,const 
 	{
 	  e_T.set(0,temp2,1);
 	  e_S=e_S+HS_inv*H_T*e_T;
-	  cout<<1<<endl;
+	  // cout<<1<<endl;
 	}
       else if (temp2!=-1&&temp3!=-1)
 	{
 	  e_T.set(0,temp2,1);
 	  e_T.set(0,temp3,1);
 	  e_S=e_S+HS_inv*H_T*e_T;
-	  cout<<2<<endl;
+	  //cout<<2<<endl;
 	}
       
       
@@ -732,7 +739,28 @@ GF2mat get_gen(const GF2mat &H){
 }
 
 
-void err_pos(const nodes errors[],const GF2mat &error){
+void err_pos2(const GF2mat &error){
+  int n=error.rows();
+  int d=sqrt(n);
+  if (d*d==n)
+    {
+      for (int r=0;r<d;r++)
+	{
+
+	  for (int c=0;c<d;c++)	    
+	    {
+	      if (error(r*d+c,0)==1){cout<<1;}
+	      else {cout<<".";}
+	    }
+	  cout<<"\n"<<endl;
+	}
+    }
+  
+ 
+}
+
+  
+ void err_pos(const nodes errors[],const GF2mat &error){
   int n=error.rows();
  
   
@@ -751,31 +779,8 @@ void err_pos(const nodes errors[],const GF2mat &error){
 	  cout<<errors[i].neighbors<<endl;
 	}
     }
- 
-}
-void err_pos2(const GF2mat &error){
-  int n=error.rows();
- 
-  
- 
-  // ivec pos; //an empty vector,ins() works well, 
-  // int pos_size=0;
 
-
-  for (int i=0;i<n;i++)
-    {
-      if (error(i,0)==1)
-	{
-	  // pos.ins(0,i);
-	  // pos_size++;
-	  cout<<i<<"  ";
-
-	}
-     
-    }
-  cout<<"\n"<<endl;
-}
-  
+ }
   
 /*
 void OSD(vec& LR,const GF2mat& H,const GF2mat& syndrome,  const GF2mat &real_e1,GF2mat &output_e){ //r is the rank of H
