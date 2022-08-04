@@ -740,22 +740,23 @@ GF2mat get_gen(const GF2mat &H){
 
 
 void err_pos2(const GF2mat &error){
+  cout<<"\n";
   int n=error.rows();
   int d=sqrt(n);
   if (d*d==n)
     {
       for (int r=0;r<d;r++)
 	{
-
+	  cout<<r<<"th row: ";
 	  for (int c=0;c<d;c++)	    
 	    {
 	      if (error(r*d+c,0)==1){cout<<1;}
 	      else {cout<<".";}
 	    }
-	  cout<<"\n"<<endl;
+	  cout<<endl;
 	}
     }
-  
+    cout<<"\n";
  
 }
 
